@@ -1,17 +1,17 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import Access from "@/views/Access.vue";
 import AdminView from "@/views/AdminView.vue";
 import LayoutView from "@/views/Layout.vue";
+import LoginView from "@/views/LoginView.vue";
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name:'Access',
-    component:Access
+    name:'Login',
+    component:LoginView
   },
   {
     path: '/access',
@@ -21,12 +21,12 @@ const routes = [
       {
         path: '',
         name: 'home',
-        component: HomeView
+        component: HomeView,
       },
       {
         path: '/admin',
         name: 'admin',
-        component: AdminView
+        component: AdminView,
       },
 
   {
@@ -52,6 +52,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
+  mode: 'history',
   routes
 })
 

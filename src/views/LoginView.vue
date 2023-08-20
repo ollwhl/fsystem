@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import request from "@/utils/request";
+
 export default {
   data() {
     return {
@@ -20,12 +22,19 @@ export default {
   methods: {
     login() {
       // 在这里处理登录逻辑，可以向后端发送请求进行验证
+      request.post("user/login",{
+        name:this.username,
+        password:this.password
+      }).then(res =>{
+        if (res.code === '0') {
+          this.$message.success('登录成功');
+          this.$router.push("/admin")
+        } else {
+          this.$message.error(res.msg);
+        }
 
-      if (this.username === 'admin' && this.password === 'password') {
-        this.$message.success('登录成功');
-      } else {
-        this.$message.error('登录失败');
-      }
+      })
+
     }
   }
 };

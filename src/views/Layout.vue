@@ -2,15 +2,15 @@
   <div id="app">
 
     <el-container>
-      <el-header style="background-color: aqua">
+      <el-header style="background-color: #0f2027">
         <img src="@/assets/logo.png" style="width: 35px">
 
-        <router-view/>
+
       </el-header>
     </el-container>
 
     <el-container>
-      <el-aside style="overflow:hidden;min-height:100vh;background-color: #42b983" main>
+      <el-aside style="overflow:hidden;min-height:100vh;background-color: #203A43" main>
         <el-menu :default-active="$route.path" router>
           <el-submenu index="1">
             <template slot="title">
