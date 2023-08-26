@@ -1,6 +1,6 @@
 import axios from 'axios'
 const request = axios.create({
-    baseURL:'http://localhost:8081',
+    baseURL:'http://192.168.0.139:8081',
     timeout: 5000
 })
 
@@ -21,7 +21,7 @@ request.interceptors.response.use(
         return res;
     },
     error =>{
-        console.log('error'+error)
+        console.log('error'+error)//for debug
         return Promise.reject(error)
     }
 )

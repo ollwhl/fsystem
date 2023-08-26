@@ -1,7 +1,7 @@
 <template>
   <div class="admin-view">
     <div class="action-bar">
-      <el-input v-model="params.keyword" placeholder="请输入内容"></el-input>
+      <el-input v-model="params.keyword" placeholder="请输入姓名或电话号码"></el-input>
       <el-button type="warning" class="action-button" @click="search()">查询</el-button>
       <el-button type="primary" class="action-button" @click="add('dialogAddForm')">新增 </el-button>
     </div>
@@ -37,9 +37,8 @@
             <el-input v-model="addForm.name" autocomplete="off" clearable></el-input>
           </el-form-item>
           <el-form-item label="人员权限" :label-width="formLabelWidth">
-            <el-select v-model="addForm.group" placeholder="员工">
+            <el-select v-model="addForm.group" placeholder="管理员">
               <el-option label="管理员" value="1"></el-option>
-              <el-option label="员工" value="2"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="密码" :label-width="formLabelWidth">
@@ -117,13 +116,12 @@
 
     methods:{
       load(){
-        const adminUrl="user/admin"
-        request.get(adminUrl,{
+        request.get("user/admin",{//get获取
           params: this.params
         }).then(res=> {//使用get方法请求/amdin
           if (res.code === '0'){
-            this.tableData =res.data.list
-            this.total =res.data.total
+            this.tableData =res.data.list//更新表格
+            this.total =res.data.total//更新总条数
           }
         })
       },
@@ -140,8 +138,8 @@
           params: this.params
         }).then(res => {
           if (res.code === '0') {
-            this.tableData = res.data.list
-            this.total =res.data.total
+            this.tableData = res.data.list//从返回的数据更新到当前页面
+            this.total =res.data.total//更新所有返回数据的总条数
           }else{
 
           }
@@ -151,13 +149,13 @@
         this.form = {}
         this[`${dialogName}Visible`] = true
         this.successMsg = "添加成功"
-      },
+      },//多个表格调用同一个方法更改数据${}连接字符串
       edit(obj){
         this.addForm = obj
         this.dialogAddFormVisible=true
         this.successMsg = "修改成功"
       },
-      submitAddForm(dialogName){
+      submitAddForm(dialogName){//提交表单调用该方法
         request.post("user/add",{
           name: this.addForm.name,
           group: this.addForm.group,
