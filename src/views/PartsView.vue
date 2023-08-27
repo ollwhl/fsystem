@@ -67,6 +67,7 @@ export default {
         keyword:"",
         pageNum:1,
         pageSize:10,
+
       },
       total: 0,
       successMsg:"",
@@ -150,20 +151,22 @@ export default {
             }
             this.load()
           });
-    }
-  },
-  loadConfirmNum(){
-    request.post("parts/count").then(
-        res=> {
-          if (res.code === 0) {
-            this.confirmNum = res.data.confirmNum;
-          } else {
-            this.$message.error(res.msg);
+    },
+    loadConfirmNum(){
+      request.post("parts/count").then(
+          res=> {
+            if (res.code === 0) {
+              this.confirmNum = res.data.confirmNum;
+            } else {
+              this.$message.error(res.msg);
 
-          }
-          this.load()
-        });
+            }
+            this.load()
+          });
+    }
+
   }
+
 
 
 }

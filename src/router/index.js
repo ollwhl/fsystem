@@ -4,7 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import AdminView from "@/views/AdminView.vue";
 import LayoutView from "@/views/Layout.vue";
 import LoginView from "@/views/LoginView.vue";
-
+import TecView from "@/views/TecView";
 Vue.use(VueRouter)
 
 const routes = [
@@ -45,7 +45,13 @@ const routes = [
     path: '/parts',
     name: 'parts',
     component: () => import( '../views/PartsView.vue')
-  }
+  },
+      {
+        path: '/tec',
+        name: 'Tec',
+        component: () => import('../views/TecView.vue')
+      }
+
     ]
   },
 
