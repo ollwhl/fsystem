@@ -27,8 +27,9 @@ export default {
         password:this.password
       }).then(res =>{
         if (res.code === '0') {
+          localStorage.setItem("user",JSON.stringify(res.data))
           this.$message.success('登录成功');
-          this.$router.push("/admin")
+          this.$router.push("/")
         } else {
           this.$message.error(res.msg);
         }

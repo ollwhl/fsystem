@@ -2,16 +2,29 @@
   <div id="app">
 
     <el-container>
-      <el-header style="background-color: #0f2027">
+      <el-header style="background-color: #0f2027; color: white; font-size: 20px; position: relative;">
         <img src="@/assets/logo.png" style="width: 35px">
-
-
+        <span>工厂生产管理系统</span>
+        <div class="dropdown-container">
+          <el-dropdown trigger="click" placement="bottom-end">
+            <span class="el-dropdown-link" style="color: #FF9900;">
+              {{user.name}}<i class="el-icon-arrow-down el-icon--right"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown" style="background-color: #333;">
+              <el-dropdown-item icon="el-icon-switch-button"><div @click="logout()">退出登录</div></el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
       </el-header>
     </el-container>
 
     <el-container>
       <el-aside style="overflow:hidden;min-height:100vh;background-color: #203A43" main>
         <el-menu :default-active="$route.path" router>
+          <el-menu-item index="/">
+            <i class="el-icon-user-solid"></i>
+            <span slot="title">主页</span>
+          </el-menu-item>
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-location"></i>
@@ -32,10 +45,6 @@
               <el-menu-item index="/log">修改日志</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item index="2">
-            <i class="el-icon-menu"></i>
-            <span slot="title">设置</span>
-          </el-menu-item>
         </el-menu>
       </el-aside>
       <el-main>
@@ -46,3 +55,31 @@
 
   </div>
 </template>
+<script>
+  import request from "@/utils/request";
+
+  export default {
+    name: "Layout",
+    data() {
+      return {
+        user:localStorage.getItem("user")?JSON.parse(localStorage.getItem("user")):{}
+      };
+    },
+    methods: {
+      logout(){
+        console.log("aaa")
+        localStorage.removeItem("user")
+        this.$router.push({path: "/login"})
+      }
+    }
+  };
+</script>
+
+<style>
+  .dropdown-container {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+  }
+</style>

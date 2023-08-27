@@ -9,17 +9,17 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/login',
     name:'Login',
     component:LoginView
   },
   {
-    path: '/access',
+    path: '/',
     name: 'Layout',
     component: LayoutView,
     children: [
       {
-        path: '',
+        path: '/',
         name: 'home',
         component: HomeView,
       },
@@ -56,4 +56,14 @@ const router = new VueRouter({
   routes
 })
 
+router.beforeEach((to,form,next) => {
+    if(to.path === '/login'){
+      next()
+    }
+    const user =localStorage.getItem("user")
+  if (!user && to.path !== "/login"){
+    return next("/login")
+  }
+    next()
+})
 export default router
