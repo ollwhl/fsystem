@@ -8,7 +8,8 @@ request.interceptors.request.use(config => {
     config.headers['Content-Type'] = 'application/json;charset=utf-8';
     const user = localStorage.getItem("user");
     if(user){
-        config.headers['token'] =JSON.parse(user).token
+        config.headers['token'] = JSON.parse(user).token
+        config.params['token'] = JSON.parse(user).token
     }
     return config;
 },error => {

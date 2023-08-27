@@ -12,11 +12,7 @@
       <el-table-column prop="name" label="零件名" width="180"></el-table-column>
       <el-table-column prop="num" label="数量" width="180"></el-table-column>
       <el-table-column prop="standard" label="规格"></el-table-column>
-      <el-table-column prop="countNum" label="交付确认">
-        <template slot-scope="scope">
-
-        </template>
-      </el-table-column>
+      <el-table-column prop="confirm" label="交付确认"></el-table-column>
       <el-table-column prop="min"  label="警戒值"></el-table-column>
       <el-table-column prop="note" label="备注"></el-table-column>
       <el-table-column label="操作" width="200">
@@ -47,7 +43,7 @@
           @current-change="handleCurrentChange"
           :current-page="params.pageNum"
           :page-sizes="[10, 20, 30, 40]"
-          :page-size="pageSize"
+          :page-size="params.pageSize"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
       </el-pagination>
@@ -64,10 +60,10 @@ export default {
   data(){
     return {
       params:{
+        group:"",
         keyword:"",
         pageNum:1,
         pageSize:10,
-
       },
       total: 0,
       successMsg:"",
@@ -83,19 +79,18 @@ export default {
   },
   created() {//页面创建时调用的方法
     this.load()
-    this.loadMinValue()
   },
   methods:{
     load(){
-    request.get("parts/part",{
-      params:this.params
-    }).then(res=>{
-      if(res.code==='0'){
-        this.tableData=res.data.list
-        this.total=res.data.total
-      }
-    })
-    },
+      request.get("parts",{
+        params:this.params
+      }).then(res=>{
+        if(res.code==='0'){
+          this.tableData=res.data.list
+          this.total=res.data.total
+        }
+      })
+      },
     cancel(row, popoverName) {
       row.addInput = "";
       row.redInput = "";
@@ -105,7 +100,7 @@ export default {
     submit(row, popoverName) {
       const input = popoverName === 'add' ? row.addInput : row.redInput;
 
-      request.post("parts/part", {
+      request.post("parts/part/count", {
         countNum: popoverName === 'add' ? input : -input, // 如果是入库操作，则传入正数，如果是出库操作，则传入负数
         id: row.id // 零件的ID，用于标识要操作的零件
       }).then(res => {
@@ -143,28 +138,6 @@ export default {
         this.load()//后台更新数据后重新显示
       })
     },
-    loadMinValue(){
-      request.get("/min").then(
-          res=> {
-            if (res.code === '0') {
-              this.min = res.data.min;
-            }
-            this.load()
-          });
-    },
-    loadConfirmNum(){
-      request.post("parts/count").then(
-          res=> {
-            if (res.code === 0) {
-              this.confirmNum = res.data.confirmNum;
-            } else {
-              this.$message.error(res.msg);
-
-            }
-            this.load()
-          });
-    }
-
   }
 
 
