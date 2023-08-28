@@ -9,7 +9,11 @@ request.interceptors.request.use(config => {
     const user = localStorage.getItem("user");
     if(user){
         config.headers['token'] = JSON.parse(user).token
-        config.params['token'] = JSON.parse(user).token
+    }
+    if (config.method === 'get') {
+        if (user) {
+            config.params['token'] = JSON.parse(user).token;
+        }
     }
     return config;
 },error => {

@@ -100,15 +100,16 @@ export default {
     submit(row, popoverName) {
       const input = popoverName === 'add' ? row.addInput : row.redInput;
 
-      request.post("parts/part/count", {
+      request.post("parts/count", {
         countNum: popoverName === 'add' ? input : -input, // 如果是入库操作，则传入正数，如果是出库操作，则传入负数
-        id: row.id // 零件的ID，用于标识要操作的零件
+        id: row.id, // 零件的ID，用于标识要操作的零件
+
       }).then(res => {
         if (res.code === '0') {
           this.$message.success("操作成功"); // 在操作成功时显示成功消息
           row[`${popoverName}Visible`] = false; // 关闭弹出框
           // 如果需要，你可能需要重新加载数据以更新表格
-          // this.load();
+          this.load();
         } else {
           this.$message.error(res.msg); // 在操作失败时显示错误消息，错误消息的内容从响应中获取
         }
@@ -123,7 +124,7 @@ export default {
       this.load()
     },
     search(){
-      request.get("parts/part/search",{
+      request.get("parts/search",{
         params:this.params
       }).then(res => {
         if (res.code === '0') {
