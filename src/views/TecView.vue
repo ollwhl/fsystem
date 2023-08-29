@@ -61,24 +61,23 @@
         <el-button type="primary" @click="submitAddForm('dialogAddFormVisible')">确认</el-button>
       </div>
     </el-dialog>
+    <!--
+       +-----------------------------------+
+       |                                   |
+       |        这里顺序很j8重要别tm动!!       |
+       |                                   |
+       +-----------------------------------+
+    -->
     <el-table :data="tableData" :span-method="objectSpanMethod" border style="width: 100%">
-      <el-table-column prop="productName" :formatter="formatProduct" label="产品名"></el-table-column>
-      <el-table-column prop="note" label="产品描述"></el-table-column>
-      <el-table-column prop="productStandard" label="产品标准"></el-table-column>
-      <el-table-column label="所需零件">
-        <template slot-scope="scope">
-          <el-tag v-for="part in scope.row.parts" :key="part.name" type="success">{{ part.name }} ({{ part.quantity }})</el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column prop="partName" label="零件名"></el-table-column>
-      <el-table-column prop="partStandard" label="零件标准"></el-table-column>
-      <el-table-column prop="num" label="数量"></el-table-column>
-      <el-table-column prop="group" label="所在仓库"></el-table-column>
+      <el-table-column label="产品名称" prop="productName"></el-table-column>
+      <el-table-column label="产品规格" prop="productStandard"></el-table-column>
+      <el-table-column label="零件名" prop="partsName"></el-table-column>
+      <el-table-column label="所需数量" prop="num"></el-table-column>
+      <el-table-column label="所在仓库" prop="partsGroup"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button @click="deleteProduct(scope.row)" type="danger" size="small">删除</el-button>
-          <el-button @click="editProduct(scope.row)" type="danger" size="small">编辑</el-button>
+          <el-button @click="editPart(scope.row)" type="text">修改</el-button>
+          <el-button @click="deletePart(scope.row)" type="text">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -92,6 +91,8 @@ export default {
   name: "TecView",
   data() {
     return {
+      margeArray: [],
+      tableData: [],
       partTypeOptions: [
         {
           value: "零件",
@@ -108,25 +109,24 @@ export default {
       spanArr: [],
       position: 0,
       selectedParts: [],
-      params:{
-        keyword:"",
-        pageSize:"10",
-        pageNum:"1",
+      params: {
+        keyword: "",
+        pageSize: "10",
+        pageNum: "1",
 
       },
-      id :"",
-      productId:"",
+      id: "",
+      productId: "",
       partsList: [],
-      tableData: [],
       total: 0,
- //biaoge
+      //biaoge
 
       //添加的新东西和需要返给后台的数据
-      addForm:{
-     date:"",
-        newproductName:"",
+      addForm: {
+        date: "",
+        newproductName: "",
       },
-      successMsg:"",
+      successMsg: "",
       dialogAddFormVisible: false,
       formLabelWidth: '120px',
 
@@ -134,99 +134,129 @@ export default {
   },
   created() {//页面创建时调用的方法
     this.load()
-    this.loadParts()
-    this.loadPartTypeOptions()
   },
 
   methods: {
+    // +-----------------------------------+
+    // |                                   |
+    // |          千万别tm动这块!!!          |
+    // |                                   |
+    // +-----------------------------------+
+    //可以调用但别动内容
     load() {
       request.get("tech", {//get获取
         params: this.params
       }).then(res => {//使用get方法请求/amdin
         if (res.code === '0') {
-          this.tableData = res.data.list//更新表格
-          this.total = res.data.total//更新总条数
+          this.tableData = res.data.list
+          //开始 调用方法计算需要合并的数据
+          for (let i = 0; i < Object.keys(this.tableData[0]).length; i++) {
+            // 首先添加一个存放合并行数据的变量
+            this.margeArray.push({Arr: [], Position: 0,})
+            // 得到下标对应的key值
+            const element = Object.keys(this.tableData[0])[i];
+            // 调用合并，
+            this.rowspan(this.tableData, this.margeArray[i].Arr, this.margeArray[i].Position, element);
+            this.total = res.data.total//更新总条数
+          }
         }
       })
     },
-    loadparts() {
-      request.get("parts").then(
-          res => {
-            if (res.code === '0') {
-              this.partList = res.data;
-            }
-          }
-      )
+    handleSizeChange(pageSize) {
+      this.params.pageSize = pageSize
+      this.load()
+    },
+    handleCurrentChange(pageNum) {
+      this.params.pageNum = pageNum
+      this.load()
     },
 
-      handleSizeChange(pageSize) {
-        this.params.pageSize = pageSize
+    search() {
+      request.get("tech/search", {
+        params: this.params
+      }).then(res => {
+        if (res.code === '0') {
+          this.tableData = res.data.list//从返回的数据更新到当前页面
+          this.total = res.data.total//更新所有返回数据的总条数
+        } else {
+
+        }
+      })
+    },
+
+    add(dialogName) {
+      this.form = {}
+      this[`${dialogName}Visible`] = true
+      this.successMsg = "添加成功"
+    },//多个表格调用同一个方法更改数据${}连接字符串
+    openAddDialog() {
+      this.dialogAddFormVisible = true;
+      this.selectedParts = []; // 重置已选零件或半成品
+    },
+    resetAddForm() {
+      this.addForm.productName = "";
+      this.addForm.partsName = "";
+    },
+
+
+    edit(obj) {
+      this.addForm = obj
+      this.dialogAddFormVisible = true
+      this.successMsg = "修改成功"
+    },
+
+    submitAddForm(dialogName) {//提交表单调用该方法
+      request.post("tech/add", {
+        productName: this.addForm.newproductName, // Use entered product name
+        partsName: this.addForm.partsName,     // Use entered parts name
+      }).then(res => {
+        if (res.code === '0') {
+          this[`${dialogName}Visible`] = false
+          this.$message({
+            message: this.successMsg,
+            type: 'success'
+          });
+        } else {
+          this.$message({
+            message: res.msg,
+            type: 'error'
+          });
+        }
         this.load()
-      },
-      handleCurrentChange(pageNum) {
-        this.params.pageNum = pageNum
-        this.load()
-      },
-
-      search() {
-        request.get("tech/search", {
-          params: this.params
-        }).then(res => {
-          if (res.code === '0') {
-            this.tableData = res.data.list//从返回的数据更新到当前页面
-            this.total = res.data.total//更新所有返回数据的总条数
+      })
+    },
+    // +-----------------------------------+
+    // |                                   |
+    // |          也别tm动这块!!!            |
+    // |                                   |
+    // +-----------------------------------+
+    rowspan(tableData, spanArr, position, spanName) {
+      tableData.forEach((item, index) => {
+        if (index === 0) {
+          spanArr.push(1);
+          position = 0;
+        } else {
+          if (tableData[index][spanName] === tableData[index - 1][spanName]) {
+            spanArr[position] += 1;
+            spanArr.push(0);
           } else {
-
+            spanArr.push(1);
+            position = index;
           }
-        })
-      },
-
-      add(dialogName) {
-        this.form = {}
-        this[`${dialogName}Visible`] = true
-        this.successMsg = "添加成功"
-      },//多个表格调用同一个方法更改数据${}连接字符串
-      openAddDialog() {
-        this.dialogAddFormVisible = true;
-        this.selectedParts = []; // 重置已选零件或半成品
-      },
-      resetAddForm() {
-        this.addForm.productName = "";
-        this.addForm.partsName = "";
-      },
-
-
-
-      edit(obj) {
-        this.addForm = obj
-        this.dialogAddFormVisible = true
-        this.successMsg = "修改成功"
-      },
-
-      submitAddForm(dialogName) {//提交表单调用该方法
-        request.post("tech/add", {
-          productName: this.addForm.newproductName, // Use entered product name
-          partsName: this.addForm.partsName,     // Use entered parts name
-        }).then(res => {
-          if (res.code === '0') {
-            this[`${dialogName}Visible`] = false
-            this.$message({
-              message: this.successMsg,
-              type: 'success'
-            });
-          } else {
-            this.$message({
-              message: res.msg,
-              type: 'error'
-            });
-          }
-          this.load()
-        })
-      },
+        }
+      });
+    },
+    // +-----------------------------------+
+    // |                                   |
+    // |          这块也tm别动!!!            |
+    // |                                   |
+    // +-----------------------------------+
     objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      for (let i = 0; i < 4; i++) {
-        if (columnIndex === i) {
-          const _row = this.spanArr[i][rowIndex];
+      // 计算一共有几列数据
+      let arraynum = Object.keys(this.tableData[0]).length
+      for (let i = 0; i < 2; i++) {
+        if (columnIndex == i) {
+          const _row = this.margeArray[i].Arr[rowIndex];
           const _col = _row > 0 ? 1 : 0;
           return {
             rowspan: _row,
@@ -235,16 +265,7 @@ export default {
         }
       }
     },
-  },
-  // 计算属性
-  computed: {
-    // 格式化产品名的方法
-    formatProduct() {
-      return (row, column, cellValue) => {
-        return `${row.productName} (${row.productStandard})`;
-      };
-    },
-  },
   }
+}
 </script>
 
