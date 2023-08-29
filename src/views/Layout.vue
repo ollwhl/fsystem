@@ -25,7 +25,7 @@
             <i class="el-icon-user-solid"></i>
             <span slot="title">主页</span>
           </el-menu-item>
-          <el-submenu index="1">
+          <el-submenu v-if="user.group !== '管理员'"index="1" >
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>人员管理</span>
@@ -44,7 +44,29 @@
               <el-menu-item index="/parts">零件库存</el-menu-item>
               <el-menu-item index="/log">修改日志</el-menu-item>
             </el-menu-item-group>
+
           </el-submenu>
+          <el-submenu index="3">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>计划部</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="/plan">计划管理</el-menu-item>
+
+            </el-menu-item-group>
+          </el-submenu>
+          <el-submenu index="4">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>科技部</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="/tec">研发项目</el-menu-item>
+
+            </el-menu-item-group>
+          </el-submenu>
+
         </el-menu>
       </el-aside>
       <el-main>
