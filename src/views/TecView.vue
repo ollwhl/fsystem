@@ -62,11 +62,11 @@
       </div>
     </el-dialog>
     <!--
-       +-----------------------------------+
-       |                                   |
-       |        这里顺序很j8重要别tm动!!       |
-       |                                   |
-       +-----------------------------------+
+       +-------------------------------------------------+
+       |                                                 |
+       |        这里table-column的顺序很j8重要别tm动!!       |
+       |                                                 |
+       +-------------------------------------------------+
     -->
     <el-table :data="tableData" :span-method="objectSpanMethod" border style="width: 100%">
       <el-table-column label="产品名称" prop="productName"></el-table-column>
