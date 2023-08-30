@@ -7,60 +7,36 @@
         style="margin-bottom: 10px"
     ></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
-    <el-button type="primary" class="action-button" @click="openAddDialog">新增</el-button>
+    <el-button type="primary" class="action-button" @click="openDialog">新增</el-button>
 
-    <el-dialog
-        title="增加产品"
-        :visible.sync="dialogAddFormVisible"
-        width="30%"
-        @close="resetAddForm"
-    >
-      <el-form :model="addForm" ref="addForm" label-width="100px">
-        <el-form-item label="产品名">
-          <el-input v-model="addForm.newproductName" placeholder="请输入产品名"></el-input>
-        </el-form-item>
-        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
 
-        </div>
-
-        <el-form-item label="零件或半成品">
-          <el-cascader
-              v-model="selectedParts"
-              :options="partTypeOptions"
-              placeholder="请选择零件或半成品"
-              @change="handlePartTypeChange"
-              clearable
-              multiple
-          ></el-cascader>
-        </el-form-item>
-
-        <el-form-item v-if="selectedParts.length > 0" label="所需零件名和数量">
-          <el-row v-for="(part, index) in selectedParts" :key="index" type="flex" align="middle">
-            <el-col :span="12">
-              <el-select v-model="part.partsId" placeholder="请选择零件名" style="width: 90%">
-                <el-option
-                    v-for="option in partTypeOptions[0].children"
-                    :key="option.value"
-                    :label="option.label"
-                    :value="option.value"
-                ></el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="10" offset="2">
-              <el-input-number v-model="part.quantity" :min="1" placeholder="请输入数量" style="width: 80%"></el-input-number>
-            </el-col>
-            <el-col :span="1">
-              <el-button @click="removePart(index)" type="text" icon="el-icon-delete"></el-button>
-            </el-col>
-          </el-row>
-        </el-form-item>
-      </el-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogAddFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitAddForm('dialogAddFormVisible')">确认</el-button>
+    <template>
+      <div>
+        <el-dialog :visible.sync="dialogData.dialogVisible" title="添加产品构成">
+          <div>
+            <div style="display: flex; align-items: center;">
+              <span style="margin-right: 12px;">产品名：</span>
+              <el-input v-model="dialogData.inputText" @input="handleInput" placeholder="在这里输入内容" />
+              <span>{{ dialogData.checkMessage }}</span>
+            </div>
+            <div v-for="(text, index) in dialogData.inputList" :key="index">
+              <div style="display: flex; align-items: center;">
+                <span style="margin-right: 10px;">添加零件 {{ index + 1 }}：</span>
+                <el-input v-model="dialogData.inputList[index]" @input="handleInputForAddedInput(index)" :placeholder="'零件 ' + (index + 1)" />
+                <span>{{ dialogData.checkMessages[index] }}</span>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+              <el-button type="primary" @click="addInputBox">添加零件</el-button>
+              <el-button type="success" @click="submitForm">提交表格</el-button>
+            </div>
+          </div>
+          <span slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog">关闭</el-button>
+      </span>
+        </el-dialog>
       </div>
-    </el-dialog>
+    </template>
     <!--
        +-------------------------------------------------+
        |                                                 |
@@ -91,41 +67,33 @@ export default {
   name: "TecView",
   data() {
     return {
+      //别tm动下面两行
       margeArray: [],
       tableData: [],
-      partTypeOptions: [
-        {
-          value: "零件",
-          label: "零件",
-          children: [],
-        },
-        {
-          value: "半成品",
-          label: "半成品",
-          children: [],
-        },
-      ],
-      budgetList: [],
-      spanArr: [],
-      position: 0,
-      selectedParts: [],
+
+
       params: {
         keyword: "",
         pageSize: "10",
         pageNum: "1",
-
       },
+
+      //这几个变量tm干啥用的 没用删了
       id: "",
       productId: "",
       partsList: [],
       total: 0,
-      //biaoge
 
-      //添加的新东西和需要返给后台的数据
-      addForm: {
-        date: "",
-        newproductName: "",
+
+      dialogData: {
+        dialogVisible: false,
+        inputText: '',
+        inputList: [''], // 初始有一个输入框
+        checkMessage: '', // 存储检查后的消息
+        checkMessages: ['','','','','']
       },
+      timeoutIds: [], // 存储每个输入框的计时器ID
+
       successMsg: "",
       dialogAddFormVisible: false,
       formLabelWidth: '120px',
@@ -139,7 +107,7 @@ export default {
   methods: {
     // +-----------------------------------+
     // |                                   |
-    // |          千万别tm动这块!!!          |
+    // |          千万别tm动load()!!!!      |
     // |          可以调用但别动内容          |
     // |                                   |
     // +-----------------------------------+
@@ -184,30 +152,62 @@ export default {
       })
     },
 
-    add(dialogName) {
-      this.form = {}
-      this[`${dialogName}Visible`] = true
-      this.successMsg = "添加成功"
-    },//多个表格调用同一个方法更改数据${}连接字符串
-    openAddDialog() {
-      this.dialogAddFormVisible = true;
-      this.selectedParts = []; // 重置已选零件或半成品
+    openDialog() {
+      this.dialogData = {
+        dialogVisible: false,
+        inputText: '',
+        inputList: [''], // 初始有一个输入框
+        checkMessage: '', // 存储检查后的消息
+        checkMessages: ['','','','','']
+      },
+      this.dialogData.dialogVisible = true;
     },
-    resetAddForm() {
-      this.addForm.productName = "";
-      this.addForm.partsName = "";
+    handleInput() {
+      clearTimeout(this.timeoutIds[0]);
+      this.timeoutIds[0] = setTimeout(() => {
+        this.performCheck();
+      }, 3000);
     },
-
-
-    edit(obj) {
-      this.addForm = obj
-      this.dialogAddFormVisible = true
-      this.successMsg = "修改成功"
+    handleInputForAddedInput(index) {
+      clearTimeout(this.timeoutIds[index + 1]);
+      this.timeoutIds[index + 1] = setTimeout(() => {
+        this.performCheckForAddedInput(index);
+      }, 3000);
     },
+    performCheck() {
+      // 模拟检查操作
+      this.dialogData.checkMessage = '检查完成';
+      setTimeout(() => {
+        this.dialogData.checkMessage = ''; // 清除消息
+      }, 2000);
+    },
+    performCheckForAddedInput(index) {
+      // 模拟检查操作
+      this.dialogData.checkMessages[index] = (index + '检查完成');
+      console.log(index + this.dialogData.checkMessages[index]);
 
+      setTimeout(() => {
+        this.dialogData.checkMessages[index] = ""; // 清除消息
+      }, 2000);
+      console.log(index + this.dialogData.checkMessages[index]);
+    },
+    addInputBox() {
+      if (this.dialogData.inputList.length < 5) {
+        this.dialogData.inputList.push('');
+        this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
+      }
+    },
+    submitForm() {
+      // 提交表格的逻辑
+      console.log('表格已提交');
+    },
+    closeDialog() {
+      this.dialogData.dialogVisible = false;
+      this.timeoutIds = []; // 关闭弹窗时清除计时器ID
+    },
     submitAddForm(dialogName) {//提交表单调用该方法
       request.post("tech/add", {
-        productName: this.addForm.newproductName, // Use entered product name
+        productName: this.addForm.productName, // Use entered product name
         partsName: this.addForm.partsName,     // Use entered parts name
       }).then(res => {
         if (res.code === '0') {
@@ -225,6 +225,9 @@ export default {
         this.load()
       })
     },
+
+
+
     // +-----------------------------------+
     // |                                   |
     // |          也别tm动这块!!!            |

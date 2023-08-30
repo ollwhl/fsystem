@@ -1,101 +1,94 @@
 <template>
-  <el-table
-      :data="tableData"
-      border
-      style="width: 100%">
-    <el-table-column
-        fixed
-        prop="date"
-        label="日期"
-        width="150">
-    </el-table-column>
-    <el-table-column
-        prop="name"
-        label="姓名"
-        width="120">
-    </el-table-column>
-    <el-table-column
-        prop="province"
-        label="省份"
-        width="120">
-    </el-table-column>
-    <el-table-column
-        prop="city"
-        label="市区"
-        width="120">
-    </el-table-column>
-    <el-table-column
-        prop="address"
-        label="地址"
-        width="300">
-    </el-table-column>
-    <el-table-column
-        prop="zip"
-        label="邮编"
-        width="120">
-    </el-table-column>
-    <el-table-column
-        fixed="right"
-        label="操作"
-        width="100">
-      <template slot-scope="scope">
-        <el-popover
-            placement="top"
-            width="160"
-            v-model="visible">
-          <p>这是一段内容这是一段内容确定删除吗？</p>
-          <div style="text-align: right; margin: 0">
-            <el-button size="mini" type="text" @click="visible = false">取消</el-button>
-            <el-button type="primary" size="mini" @click="visible = false">确定</el-button>
+  <div>
+    <el-button @click="openDialog" type="primary">打开弹窗</el-button>
+
+    <el-dialog :visible.sync="dialogData.dialogVisible" title="自动生成输入框和自动检查">
+      <div>
+        <div style="display: flex; align-items: center;">
+          <span style="margin-right: 12px;">产品名：</span>
+          <el-input v-model="dialogData.inputText" @input="handleInput" placeholder="在这里输入内容" />
+        </div>
+        <span>{{ dialogData.checkMessage }}</span>
+        <div v-for="(text, index) in dialogData.inputList" :key="index">
+          <div style="display: flex; align-items: center;">
+            <span style="margin-right: 10px;">输入框 {{ index + 2 }}：</span>
+            <el-input v-model="dialogData.inputList[index]" @input="handleInputForAddedInput(index)" :placeholder="'输入框 ' + (index + 2)" />
+            <span>{{ dialogData.checkMessages[index] }}</span>
           </div>
-          <el-button slot="reference">删除</el-button>
-        </el-popover>
-      </template>
-    </el-table-column>
-  </el-table>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+          <el-button type="primary" @click="addInputBox">新增输入框</el-button>
+          <el-button type="success" @click="submitForm">提交表格</el-button>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog">关闭</el-button>
+      </span>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
-export default {
-  methods: {
-    handleClick(row) {
-      console.log(row);
-    }
-  },
+  export default {
+    data() {
+      return {
+        dialogData: {
+          dialogVisible: false,
+          inputText: '',
+          inputList: [''], // 初始有一个输入框
+          checkMessage: '', // 存储检查后的消息
+          checkMessages: ['','','','','']
+        },
+        timeoutIds: [] // 存储每个输入框的计时器ID
+      };
+    },
+    methods: {
+      openDialog() {
+        this.dialogData.dialogVisible = true;
+      },
+      handleInput() {
+        clearTimeout(this.timeoutIds[0]);
+        this.timeoutIds[0] = setTimeout(() => {
+          this.performCheck();
+        }, 3000);
+      },
+      handleInputForAddedInput(index) {
+        clearTimeout(this.timeoutIds[index + 1]);
+        this.timeoutIds[index + 1] = setTimeout(() => {
+          this.performCheckForAddedInput(index);
+        }, 3000);
+      },
+      performCheck() {
+        // 模拟检查操作
+        this.dialogData.checkMessage = '检查完成';
+        setTimeout(() => {
+          this.dialogData.checkMessage = ''; // 清除消息
+        }, 2000);
+      },
+      performCheckForAddedInput(index) {
+        // 模拟检查操作
+        this.dialogData.checkMessages[index] = (index + '检查完成');
+        console.log(index + this.dialogData.checkMessages[index]);
 
-  data() {
-    return {
-      visible: false,
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1518 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1517 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1519 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1516 弄',
-        zip: 200333
-      }]
+        setTimeout(() => {
+          this.dialogData.checkMessages[index] = ""; // 清除消息
+        }, 2000);
+        console.log(index + this.dialogData.checkMessages[index]);
+      },
+      addInputBox() {
+        if (this.dialogData.inputList.length < 5) {
+          this.dialogData.inputList.push('');
+          this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
+        }
+      },
+      submitForm() {
+        // 提交表格的逻辑
+        console.log('表格已提交');
+      },
+      closeDialog() {
+        this.dialogData.dialogVisible = false;
+        this.timeoutIds = []; // 关闭弹窗时清除计时器ID
+      }
     }
-  }
-}
+  };
 </script>
