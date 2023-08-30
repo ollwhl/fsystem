@@ -52,8 +52,18 @@
       <el-table-column label="所在仓库" prop="partsGroup"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button @click="editPart(scope.row)" type="text">修改</el-button>
-          <el-button @click="deletePart(scope.row)" type="text">删除</el-button>
+          <el-button @click="edit(scope.row)" type="text">修改</el-button>
+          <el-popover
+              placement="top"
+              width="160"
+              v-model="visible">
+            <p>这是一段内容这是一段内容确定删除吗？</p>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+              <el-button type="primary" size="mini" @confirm="delete(scope.row)">确定</el-button>
+            </div>
+            <el-button slot="reference">删除</el-button>
+          </el-popover>
         </template>
       </el-table-column>
     </el-table>
@@ -182,14 +192,12 @@ export default {
       }, 2000);
     },
     performCheckForAddedInput(index) {
-      // 模拟检查操作
+      // 模拟检查操作lingjian
       this.dialogData.checkMessages[index] = (index + '检查完成');
-      console.log(index + this.dialogData.checkMessages[index]);
+      //console.log(index + this.dialogData.checkMessages[index]);
 
-      setTimeout(() => {
-        this.dialogData.checkMessages[index] = ""; // 清除消息
-      }, 2000);
-      console.log(index + this.dialogData.checkMessages[index]);
+
+
     },
     addInputBox() {
       if (this.dialogData.inputList.length < 5) {
@@ -226,6 +234,24 @@ export default {
       })
     },
 
+
+
+
+
+    delete(row){
+      console.log(6666)
+      request.post("/tech/delParts").then(res=>{
+        id: row.id
+        if(res.code==='0'){
+          this.$message({
+            message:res.msg,
+            type: 'success'
+          });
+        }
+      })
+      this.visible=false
+
+    },
 
 
     // +-----------------------------------+
