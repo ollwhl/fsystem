@@ -16,7 +16,7 @@
           <div>
             <div style="display: flex; align-items: center;">
               <span style="margin-right: 12px;">产品名：</span>
-              <el-input v-model="dialogData.inputText" @input="handleInput" placeholder="在这里输入内容" />
+              <el-input v-model="dialogData.productName" @input="handleInput" placeholder="在这里输入内容" />
               <span>{{ dialogData.checkMessage }}</span>
             </div>
             <div v-for="(text, index) in dialogData.inputList" :key="index">
@@ -28,6 +28,7 @@
             </div>
             <div style="text-align: center; margin-top: 20px;">
               <el-button type="primary" @click="addInputBox">添加零件</el-button>
+
               <el-button type="success" @click="submitForm">提交表格</el-button>
             </div>
           </div>
@@ -52,21 +53,34 @@
       <el-table-column label="所在仓库" prop="partsGroup"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button @click="edit(scope.row)" type="text">修改</el-button>
+          <el-button type="primary" @click="edit(scope.row)" >修改</el-button>
+
           <el-popover
               placement="top"
               width="160"
-              v-model="visible">
-            <p>这是一段内容这是一段内容确定删除吗？</p>
+              v-model="scope.row.delVisible">
+            <p>确定删除吗？</p>
             <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="visible = false">取消</el-button>
-              <el-button type="primary" size="mini" @confirm="delete(scope.row)">确定</el-button>
+              <el-button size="mini" type="text" @click="cancel(scope.row,'del')">取消</el-button>
+              <el-button type="primary" size="mini" @click="delParts(scope.row)">确定</el-button>
             </div>
-            <el-button slot="reference">删除</el-button>
+            <el-button slot="reference" style="margin-left: 10px" >删除</el-button>
           </el-popover>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 编辑弹窗 -->
+    <el-dialog :visible.sync="editVisible" title="编辑零件数量">
+      <el-form :model="editRow" ref="editForm" label-width="100px">
+        <el-form-item label="零件数量">
+          <el-input v-model.number="editRow.num"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="cancelEdit">取消</el-button>
+        <el-button type="primary" @click="saveEdit">保存</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -91,13 +105,17 @@ export default {
       //这几个变量tm干啥用的 没用删了
       id: "",
       productId: "",
-      partsList: [],
-      total: 0,
+      total: 0,//忘了，不知道
+      // create list
+      //productList: [],
 
+      //edit
+      editVisible: false,
+      editRow: {},
 
       dialogData: {
         dialogVisible: false,
-        inputText: '',
+        productName: '',
         inputList: [''], // 初始有一个输入框
         checkMessage: '', // 存储检查后的消息
         checkMessages: ['','','','','']
@@ -148,7 +166,13 @@ export default {
       this.params.pageNum = pageNum
       this.load()
     },
+    cancel(row, popoverName) {
+      row.delParts = "";
 
+      row[`${popoverName}Visible`] = false;
+      row.delVisible = false;
+
+    },
     search() {
       request.get("tech/search", {
         params: this.params
@@ -162,10 +186,11 @@ export default {
       })
     },
 
+
     openDialog() {
       this.dialogData = {
         dialogVisible: false,
-        inputText: '',
+        productName: '',
         inputList: [''], // 初始有一个输入框
         checkMessage: '', // 存储检查后的消息
         checkMessages: ['','','','','']
@@ -205,9 +230,25 @@ export default {
         this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
       }
     },
-    submitForm() {
+    submitForm() {//提交新产品
       // 提交表格的逻辑
-      console.log('表格已提交');
+      const dataToSend = [
+        {productName:this.dialogData.productName,inputList:this.dialogData.inputList}
+      ];
+      //this.productList.push(dataToSend);
+      request.post("tech/addTech",dataToSend).then(
+          res=>{
+            if(res.code === '0'){
+              this.$message({
+                message:"提交成功",
+                type:"success"
+              });
+              this.dialogData.dialogVisible=false;
+            }else{
+              this.$message.error(res.msg);
+            }
+          }
+      )
     },
     closeDialog() {
       this.dialogData.dialogVisible = false;
@@ -234,14 +275,38 @@ export default {
       })
     },
 
+    edit(row){
+      // 将行数据复制到编辑行数据中
+      this.editRow = { ...row };
+      this.editVisible = true;
+},
+    cancelEdit() {
+      this.editVisible = false; // 关闭编辑弹窗
+    },
+    saveEdit(row) {
+      // 保存编辑后的数据
+      // 提交编辑的逻辑，例如发送请求更新后端数据
+      request.post("tech/edit",{
+        id:this.editRow.id,
+        num:this.editRow.num,
+      }).then(res=>
+      {
+        if(res.code==='0'){
+          this.$message.success("修改成功");
+        }else {
+          this.$message.error(res.msg);
+        }
+      })
+      console.log('编辑提交', this.editRow);
+      // 关闭编辑弹窗
+      this.editVisible = false;
+      this.load()
+    },
 
-
-
-
-    delete(row){
+    delParts(row){
       console.log(6666)
-      request.post("/tech/delParts").then(res=>{
-        id: row.id
+      request.post("/tech/delParts", {id: row.id}).then(res=>{
+
         if(res.code==='0'){
           this.$message({
             message:res.msg,
@@ -249,7 +314,7 @@ export default {
           });
         }
       })
-      this.visible=false
+      row.delVisible=false
 
     },
 
