@@ -8,7 +8,19 @@
     ></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
     <el-button type="primary" class="action-button" @click="openDialog">新增</el-button>
+    <el-button type="success" class="action-button" @click="openAddProductDialog">新增产品</el-button>
 
+    <el-dialog :visible.sync="addProductDialogVisible" title="新增产品">
+      <el-form :model="newProductForm" label-width="80px">
+        <el-form-item label="产品名称">
+          <el-input v-model="newProductForm.productName"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="cancelAddProduct">取消</el-button>
+        <el-button type="primary" @click="saveAddProduct">保存</el-button>
+      </div>
+    </el-dialog>
 
     <template>
       <div>
@@ -102,8 +114,12 @@ export default {
         pageSize: "10",
         pageNum: "1",
       },
-
-
+      addProductDialogVisible: false,
+       newProductForm: {
+        productName: "",
+        partsName:"",
+        num:"",
+      },
       //edit
       editVisible: false,
       editRow: {},
@@ -185,7 +201,36 @@ export default {
         }
       })
     },
+    // 打开新增产品弹窗
+    openAddProductDialog() {
+      this.addProductDialogVisible = true;
+      this.newProductForm.productName = ""; // 清空输入框
+    },
 
+    // 取消新增产品
+    cancelAddProduct() {
+      this.addProductDialogVisible = false;
+    },
+
+    // 保存新增产品
+    saveAddProduct() {
+      const productData = { ...this.newProductForm };
+
+      // 发送请求到后台，在这里假设后台的接口为 "addNewProduct"
+      request.post("parts/addParts", {
+        name:this.newProductForm.productName,
+      })
+          .then((res) => {
+            if (res.code === '0') {
+              this.$message.success("新增产品成功");
+              // 如果需要，你可能需要重新加载数据以更新表格
+              this.load();
+              this.addProductDialogVisible = false; // 关闭弹窗
+            } else {
+              this.$message.error(res.msg);
+            }
+          });
+    },
 
     openDialog() {
       this.dialogData = {
@@ -238,7 +283,7 @@ export default {
       this.dialogData.partNameList.splice(index, 1);
       this.dialogData.numList.splice(index, 1);
     },
-    submitForm() {//提交新产品
+    submitForm() {//提交产品零件
       for (let i = 0; i < this.dialogData.partNameList.length; i++) {
         request.post("tech/addTechRow",{
           productName: this.dialogData.productName,

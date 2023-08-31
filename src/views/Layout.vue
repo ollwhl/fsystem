@@ -67,6 +67,17 @@
             </el-menu-item-group>
           </el-submenu>
 
+          <el-submenu index="4">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>生产车间</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="/factory">确认项目</el-menu-item>
+
+            </el-menu-item-group>
+          </el-submenu>
+
         </el-menu>
       </el-aside>
       <el-main>

@@ -40,7 +40,11 @@ const routes = [
     name: 'log',
     component: () => import('../views/LogView.vue')
   },
-
+      {
+        path: '/factory',
+        name: 'Factory',
+        component: () => import('../views/FactoryView.vue')
+      },
   {
     path: '/parts',
     name: 'parts',
