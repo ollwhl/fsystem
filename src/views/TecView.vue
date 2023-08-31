@@ -31,6 +31,10 @@
               <el-input v-model="dialogData.productName" @input="handleInput" placeholder="在这里输入内容" />
               <span>{{dialogData.checkMessage}}</span>
             </div>
+            <template v-if="showProductDetails">
+              <el-input v-model="dialogData.productStandard" placeholder="产品规格" />
+              <el-input v-model="dialogData.productDescription" placeholder="产品描述" />
+            </template>
             <div v-for="(text, index) in dialogData.partNameList" :key="index">
               <div style="display: flex; align-items: center;">
                 <span style="margin-right: 10px;">零件名 {{ index + 1 }}：</span>
@@ -132,7 +136,8 @@ export default {
         checkMessage: '', // 存储检查后的消息
         checkPartsMessage: ""
       },
-      timeoutIds: [], // 存储每个输入框的计时器ID
+      showProductDetails: true,
+
 
       successMsg: "",
       formLabelWidth: '120px',
@@ -144,7 +149,7 @@ export default {
   },
   computed: {
     isDisabled() {
-      return (this.dialogData.checkPartsMessage === "零件不存在" || this.dialogData.checkMessage === "产品不存在")
+      return this.dialogData.checkPartsMessage === "零件不存在"
     }
   },
   methods: {
@@ -248,11 +253,13 @@ export default {
       request.get(`parts/findProductByName?name=${productName}`)
               .then(res => {
                 if (res.code === '0') {
-                  this.dialogData.checkMessage = "产品存在";
+                  this.dialogData.checkMessage = "产品已存在,新增构成";
+                  this.showProductDetails = false;
                   //console.log("ok");
                 } else {
-                  this.dialogData.checkMessage = "产品不存在";
+                  this.dialogData.checkMessage = "新增产品";
                   //console.log("not ok");
+                  this.showProductDetails = true;
                 }
               });
     },
@@ -303,7 +310,7 @@ export default {
                 }
         )
       }
-      location.reload();
+      //location.reload();
     },
     closeDialog() {
       this.dialogData.dialogVisible = false;
