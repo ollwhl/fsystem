@@ -17,24 +17,25 @@
             <div style="display: flex; align-items: center;">
               <span style="margin-right: 12px;">产品名：</span>
               <el-input v-model="dialogData.productName" @input="handleInput" placeholder="在这里输入内容" />
-              <span>{{ dialogData.checkMessage }}</span>
+              <span>{{dialogData.checkMessage}}</span>
             </div>
-            <div v-for="(text, index) in dialogData.inputList" :key="index">
+            <div v-for="(text, index) in dialogData.partNameList" :key="index">
               <div style="display: flex; align-items: center;">
-                <span style="margin-right: 10px;">添加零件 {{ index + 1 }}：</span>
-                <el-input v-model="dialogData.inputList[index]" @input="handleInputForAddedInput(index)" :placeholder="'零件 ' + (index + 1)" />
-                <span>{{ dialogData.checkMessages[index] }}</span>
+                <span style="margin-right: 10px;">零件名 {{ index + 1 }}：</span>
+                <el-input v-model="dialogData.partNameList[index]" @input="handleInputForAddedInput(index)" :placeholder="'零件 ' + (index + 1)" />
+
+                <span style="margin-right: 10px;">零件数量：</span>
+                <el-input v-model="dialogData.numList[index]" @input="handleInputForAddedNum(index)" :placeholder="'零件数量'" />
+                <el-button @click="removePart(index)" icon="el-icon-close"></el-button>
               </div>
             </div>
-            <div style="text-align: center; margin-top: 20px;">
-              <el-button type="primary" @click="addInputBox">添加零件</el-button>
-
-              <el-button type="success" @click="submitForm">提交表格</el-button>
-            </div>
+            <span>{{dialogData.checkPartsMessage}}</span>
           </div>
           <span slot="footer" class="dialog-footer">
-        <el-button @click="closeDialog">关闭</el-button>
-      </span>
+            <el-button type="primary" @click="addInputBox" :disabled="isDisabled">添加零件</el-button>
+            <el-button type="success" @click="submitForm">提交表格</el-button>
+            <el-button @click="closeDialog">关闭</el-button>
+          </span>
         </el-dialog>
       </div>
     </template>
@@ -102,12 +103,6 @@ export default {
         pageNum: "1",
       },
 
-      //这几个变量tm干啥用的 没用删了
-      id: "",
-      productId: "",
-      total: 0,//忘了，不知道
-      // create list
-      //productList: [],
 
       //edit
       editVisible: false,
@@ -116,14 +111,14 @@ export default {
       dialogData: {
         dialogVisible: false,
         productName: '',
-        inputList: [''], // 初始有一个输入框
+        partNameList: [''], // 初始有一个输入框
+        numList: [''],
         checkMessage: '', // 存储检查后的消息
-        checkMessages: ['','','','','']
+        checkPartsMessage: ""
       },
       timeoutIds: [], // 存储每个输入框的计时器ID
 
       successMsg: "",
-      dialogAddFormVisible: false,
       formLabelWidth: '120px',
 
     }
@@ -131,7 +126,11 @@ export default {
   created() {//页面创建时调用的方法
     this.load()
   },
-
+  computed: {
+    isDisabled() {
+      return (this.dialogData.checkPartsMessage === "零件不存在" || this.dialogData.checkMessage === "产品不存在")
+    }
+  },
   methods: {
     // +-----------------------------------+
     // |                                   |
@@ -166,6 +165,7 @@ export default {
       this.params.pageNum = pageNum
       this.load()
     },
+
     cancel(row, popoverName) {
       row.delParts = "";
 
@@ -191,69 +191,81 @@ export default {
       this.dialogData = {
         dialogVisible: false,
         productName: '',
-        inputList: [''], // 初始有一个输入框
+        partNameList: [''], // 初始有一个输入框
+        numList: [''],
         checkMessage: '', // 存储检查后的消息
-        checkMessages: ['','','','','']
+        checkPartsMessage: ""
       },
       this.dialogData.dialogVisible = true;
     },
     handleInput() {
-      clearTimeout(this.timeoutIds[0]);
-      this.timeoutIds[0] = setTimeout(() => {
-        this.performCheck();
-      }, 3000);
+      const productName = this.dialogData.productName;
+      request.get(`parts/findProductByName?name=${productName}`)
+              .then(res => {
+                if (res.code === '0') {
+                  this.dialogData.checkMessage = "产品存在";
+                  //console.log("ok");
+                } else {
+                  this.dialogData.checkMessage = "产品不存在";
+                  //console.log("not ok");
+                }
+              });
     },
+
     handleInputForAddedInput(index) {
-      clearTimeout(this.timeoutIds[index + 1]);
-      this.timeoutIds[index + 1] = setTimeout(() => {
-        this.performCheckForAddedInput(index);
-      }, 3000);
+      const partsName = this.dialogData.partNameList[index];
+      request.get(`parts/findPartsByName?name=${partsName}`)
+              .then(res => {
+                if (res.code === '0') {
+                  this.dialogData.checkPartsMessage="零件存在"
+                  console.log("ok")
+                } else {
+                  this.dialogData.checkPartsMessage="零件不存在"
+                  console.log(" no ok")
+                }
+              });
     },
-    performCheck() {
-      // 模拟检查操作
-      this.dialogData.checkMessage = '检查完成';
-      setTimeout(() => {
-        this.dialogData.checkMessage = ''; // 清除消息
-      }, 2000);
-    },
-    performCheckForAddedInput(index) {
-      // 模拟检查操作lingjian
-      this.dialogData.checkMessages[index] = (index + '检查完成');
-      //console.log(index + this.dialogData.checkMessages[index]);
-
-
-
+    handleInputForAddedNum(index){
     },
     addInputBox() {
-      if (this.dialogData.inputList.length < 5) {
-        this.dialogData.inputList.push('');
+      if (this.dialogData.partNameList.length < 5) {
+        this.dialogData.partNameList.push('');
+        this.dialogData.numList.push('');
         this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
       }
     },
+    removePart(index) {
+      this.dialogData.partNameList.splice(index, 1);
+      this.dialogData.numList.splice(index, 1);
+    },
     submitForm() {//提交新产品
-      // 提交表格的逻辑
-      const dataToSend = [
-        {productName:this.dialogData.productName,inputList:this.dialogData.inputList}
-      ];
-      //this.productList.push(dataToSend);
-      request.post("tech/addTech",dataToSend).then(
-          res=>{
-            if(res.code === '0'){
-              this.$message({
-                message:"提交成功",
-                type:"success"
-              });
-              this.dialogData.dialogVisible=false;
-            }else{
-              this.$message.error(res.msg);
-            }
-          }
-      )
+      for (let i = 0; i < this.dialogData.partNameList.length; i++) {
+        request.post("tech/addTechRow",{
+          productName: this.dialogData.productName,
+          partsName: this.dialogData.partNameList[i],
+          num: this.dialogData.numList[i]
+        }).then(
+                res=>{
+                  if(res.code === '0'){
+                    this.$message({
+                      message:"提交成功",
+                      type:"success"
+                    });
+                    this.dialogData.dialogVisible=false;
+                  }else{
+                    this.$message.error(res.msg);
+                  }
+                }
+        )
+      }
+      location.reload();
     },
     closeDialog() {
       this.dialogData.dialogVisible = false;
       this.timeoutIds = []; // 关闭弹窗时清除计时器ID
     },
+
+    //这tm干啥用的
     submitAddForm(dialogName) {//提交表单调用该方法
       request.post("tech/add", {
         productName: this.addForm.productName, // Use entered product name
@@ -271,8 +283,9 @@ export default {
             type: 'error'
           });
         }
-        this.load()
+
       })
+      location.reload();
     },
 
     edit(row){
@@ -300,11 +313,11 @@ export default {
       console.log('编辑提交', this.editRow);
       // 关闭编辑弹窗
       this.editVisible = false;
-      this.load()
+      location.reload();
     },
 
     delParts(row){
-      console.log(6666)
+      //console.log(6666)
       request.post("/tech/delParts", {id: row.id}).then(res=>{
 
         if(res.code==='0'){
@@ -315,7 +328,7 @@ export default {
         }
       })
       row.delVisible=false
-
+      location.reload();
     },
 
 

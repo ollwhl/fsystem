@@ -12,6 +12,7 @@
       <el-table-column prop="name" label="零件名" width="180"></el-table-column>
       <el-table-column prop="num" label="数量" width="180"></el-table-column>
       <el-table-column prop="standard" label="规格"></el-table-column>
+      <el-table-column prop="group" label="仓库"></el-table-column>
       <el-table-column prop="confirm" label="交付确认"></el-table-column>
       <el-table-column prop="min"  label="警戒值"></el-table-column>
       <el-table-column prop="note" label="备注"></el-table-column>
@@ -82,7 +83,16 @@ export default {
   },
   methods:{
     load(){
-      request.get("parts",{
+      const group = localStorage.getItem("group")
+      let url = null
+      if (group === "零件仓库") {
+        url = "/parts/getParts"
+      }else if (group === "半成品仓库"){
+        url = "/parts/getHalfProduct"
+      }else{
+        url = "/parts/getAllParts"
+      }
+      request.get(url,{
         params:this.params
       }).then(res=>{
         if(res.code==='0'){
