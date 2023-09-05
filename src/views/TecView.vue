@@ -117,6 +117,7 @@ export default {
         keyword: "",
         pageSize: "10",
         pageNum: "1",
+
       },
       addProductDialogVisible: false,
        newProductForm: {
