@@ -1,7 +1,7 @@
 <template>
   <div class="stuff-view">
     <div class="action-bar">
-      <el-input v-model="params.keyword" placeholder="请输入姓名或电话号码"></el-input>
+      <el-input v-model="params.keyword" placeholder="请输入姓名或电话号码" :style="{ width: '50%' }"></el-input>
       <el-button type="warning" class="action-button" @click="search()">查询</el-button>
       <el-button type="primary" class="action-button" @click="add('dialogAddForm')">新增 </el-button>
     </div>
@@ -9,12 +9,13 @@
     <el-table :data="tableData":style="{ width: '100%' }" height="700">
       <el-table-column prop="name" label="姓名" width="120"></el-table-column>
       <el-table-column prop="phone" label="电话" width="300"></el-table-column>
+      <el-table-column prop="group" label="部门" width="300"></el-table-column>
       <el-table-column prop="note" label="附录" ></el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <div class="action-buttons">
             <el-button type="primary" @click="edit(scope.row)">编辑</el-button>
-            <el-button type="danger">显示密码</el-button>
+
           </div>
         </template>
       </el-table-column>
@@ -38,7 +39,12 @@
           </el-form-item>
           <el-form-item label="人员权限" :label-width="formLabelWidth">
             <el-select v-model="addForm.group" placeholder="员工">
-              <el-option label="员工" value="2"></el-option>
+              <el-option label="计划部" value="计划部"></el-option>
+              <el-option label="科技部" value="科技部"></el-option>
+              <el-option label="生产部" value="生产部"></el-option>
+              <el-option label="零件仓库" value="零件仓库"></el-option>
+              <el-option label="半成品仓库" value="半成品仓库"></el-option>
+              <el-option label="总成仓库" value="总成仓库"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="密码" :label-width="formLabelWidth">

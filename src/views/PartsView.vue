@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-input v-model="params.keyword" placeholder="请输入姓名或电话号码"></el-input>
+    <el-input v-model="params.keyword"  :style="{ width: '50%' }" placeholder="请输入姓名或电话号码"></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
 
     <el-table
@@ -75,7 +75,8 @@ export default {
       addInput:"",
       redInput:"",
       tableData: [],
-      confirmNum:"" //交付确认
+      confirmNum:"", //交付确认
+      user:localStorage.getItem("user")?JSON.parse(localStorage.getItem("user")):{}
     }
   },
   created() {//页面创建时调用的方法

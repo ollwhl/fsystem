@@ -2,26 +2,7 @@
   <div>
     <el-input v-model="params.keyword" :style="{ width: '50%' }" placeholder="请输入计划名称"></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
-    <el-button type="primary" class="action-button" @click="openAddDialog">新增</el-button>
 
-    <!-- 新增弹窗 -->
-    <el-dialog :visible.sync="addVisible" title="新增计划">
-      <el-form :model="addRow" ref="addForm" label-width="100px">
-
-        <el-form-item label="产品名称">
-          <el-input v-model="addRow.name"></el-input>
-        </el-form-item>
-        <el-form-item label="数量">
-          <el-input v-model="addRow.planNum"></el-input>
-        </el-form-item>
-        <el-form-item label="截止日期">
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button @click="cancelAdd">取消</el-button>
-        <el-button type="primary" @click="saveAdd">保存</el-button>
-      </div>
-    </el-dialog>
 
 
 
@@ -31,9 +12,10 @@
         border
         style="width: 100%"
     >
-<!--      <el-table-column prop="name" label="产品名称" width="180"></el-table-column>-->
+      <!--      <el-table-column prop="name" label="产品名称" width="180"></el-table-column>-->
       <el-table-column prop="name" label="产品名称" width="180"></el-table-column>
-      <el-table-column prop="planNum" label="数量"></el-table-column>
+      <el-table-column prop="planNum" label="计划数量"></el-table-column>
+      <el-table-column prop="madeNum" label="已完成数量"></el-table-column>
       <el-table-column prop="planDate" label="截止期限"></el-table-column>
 
       <el-table-column label="操作" width="200">
@@ -42,12 +24,12 @@
         <template slot-scope="scope">
           <el-button type="primary" @click="editPlan(scope.row)">修改</el-button>
           <el-popover placement="top" width="160" v-model="scope.row.delVisible">
-            <p>确定删除吗？</p>
+            <p>确定完成吗？</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancel(scope.row,'del')">取消</el-button>
               <el-button type="primary" size="mini" @click="delPlan(scope.row)">确定</el-button>
             </div>
-            <el-button slot="reference" style="margin-left: 10px">删除</el-button>
+            <el-button slot="reference" style="margin-left: 10px">确认完成</el-button>
           </el-popover>
 
         </template>
@@ -62,12 +44,12 @@
         <el-form-item label="计划数量">
           <el-input v-model="editRow.planNum"></el-input>
         </el-form-item>
-        <el-form-item label="已完成数量">
-          <el-input v-model="editRow.madeNum"></el-input>
-        </el-form-item>
-        <el-form-item label="截止日期">
-          <el-input v-model="editRow.planDate"></el-input>
-        </el-form-item>
+          <el-form-item label="已完成数量">
+            <el-input v-model="editRow.madeNum"></el-input>
+          </el-form-item>
+            <el-form-item label="截止日期">
+              <el-input v-model="editRow.planDate"></el-input>
+            </el-form-item>
 
       </el-form>
       <div slot="footer">
@@ -75,6 +57,7 @@
         <el-button type="primary" @click="saveEdit">保存</el-button>
       </div>
     </el-dialog>
+
 
 
 
@@ -111,8 +94,8 @@ export default {
       successMsg:"",
       addVisible: false,
       id:"",
-      planDate:"",
-      planNum:"",
+      date:"",
+      productName:"",
       tableData: [],
       name: "",
 
@@ -171,9 +154,7 @@ export default {
     },
     // 保存新增
     saveAdd() {
-      request.post("plan/editPlan", this.addRow
-
-      ).then((res) => {
+      request.post("plan/addPlan", this.addRow).then((res) => {
         if (res.code === "0") {
           this.$message.success("新增计划成功");
           this.addVisible = false;
@@ -188,7 +169,7 @@ export default {
       row[`${popoverName}Visible`] = false;
     },
     delPlan(row) {
-      request.post("plan/delPlan", { id: row.id }).then(res => {
+      request.post("plan/delPlan", { name: row.name }).then(res => {
         if (res.code === '0') {
           this.$message.success("计划删除成功");
           // 如果需要，你可能需要重新加载数据以更新表格

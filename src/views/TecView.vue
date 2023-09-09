@@ -8,19 +8,7 @@
     ></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
     <el-button type="primary" class="action-button" @click="openDialog">新增</el-button>
-    <el-button type="success" class="action-button" @click="openAddProductDialog">新增产品</el-button>
 
-    <el-dialog :visible.sync="addProductDialogVisible" title="新增产品">
-      <el-form :model="newProductForm" label-width="80px">
-        <el-form-item label="产品名称">
-          <el-input v-model="newProductForm.productName"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button @click="cancelAddProduct">取消</el-button>
-        <el-button type="primary" @click="saveAddProduct">保存</el-button>
-      </div>
-    </el-dialog>
 
     <template>
       <div>
@@ -28,12 +16,12 @@
           <div>
             <div style="display: flex; align-items: center;">
               <span style="margin-right: 12px;">产品名：</span>
-              <el-input v-model="dialogData.productName" @input="handleInput" placeholder="在这里输入内容" />
+              <el-input v-model="dialogData.productName" :style="{ width: '50%' }" @input="handleInput" placeholder="在这里输入内容" />
               <span>{{dialogData.checkMessage}}</span>
             </div>
             <template v-if="showProductDetails">
-              <el-input v-model="dialogData.productStandard" placeholder="产品规格" />
-              <el-input v-model="dialogData.productDescription" placeholder="产品描述" />
+              <el-input v-model="dialogData.productStandard" :style="{ width: '25%' }" placeholder="产品规格" />
+              <el-input v-model="dialogData.productDescription"  :style="{ width: '25%' }"placeholder="产品描述" />
             </template>
             <div v-for="(text, index) in dialogData.partNameList" :key="index">
               <div style="display: flex; align-items: center;">
@@ -206,36 +194,6 @@ export default {
 
         }
       })
-    },
-    // 打开新增产品弹窗
-    openAddProductDialog() {
-      this.addProductDialogVisible = true;
-      this.newProductForm.productName = ""; // 清空输入框
-    },
-
-    // 取消新增产品
-    cancelAddProduct() {
-      this.addProductDialogVisible = false;
-    },
-
-    // 保存新增产品
-    saveAddProduct() {
-      const productData = { ...this.newProductForm };
-
-      // 发送请求到后台，在这里假设后台的接口为 "addNewProduct"
-      request.post("parts/addParts", {
-        name:this.newProductForm.productName,
-      })
-          .then((res) => {
-            if (res.code === '0') {
-              this.$message.success("新增产品成功");
-              // 如果需要，你可能需要重新加载数据以更新表格
-              this.load();
-              this.addProductDialogVisible = false; // 关闭弹窗
-            } else {
-              this.$message.error(res.msg);
-            }
-          });
     },
 
     openDialog() {

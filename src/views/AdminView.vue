@@ -1,7 +1,7 @@
 <template>
   <div class="admin-view">
     <div class="action-bar">
-      <el-input v-model="params.keyword" placeholder="请输入姓名或电话号码"></el-input>
+      <el-input v-model="params.keyword" placeholder="请输入姓名或电话号码" :style="{ width: '50%' }"></el-input>
       <el-button type="warning" class="action-button" @click="search()">查询</el-button>
       <el-button type="primary" class="action-button" @click="add('dialogAddForm')">新增 </el-button>
     </div>

@@ -56,9 +56,14 @@ const routes = [
         component: () => import('../views/TecView.vue')
       },
       {
-        path: '/plan',
-        name: 'Plan',
+        path: '/newplan',
+        name: 'newPlan',
         component: () => import('../views/Planview.vue')
+      },
+      {
+        path: '/oldplan',
+        name: 'oldPlan',
+        component: () => import('../views/oldPlanview.vue')
       }
     ]
   },

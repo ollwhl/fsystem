@@ -25,7 +25,7 @@
             <i class="el-icon-user-solid"></i>
             <span slot="title">主页</span>
           </el-menu-item>
-          <el-submenu v-if="user.group !== '管理员'"index="1" >
+          <el-submenu v-if="user.group === '管理员'" index="1" >
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>人员管理</span>
@@ -35,7 +35,7 @@
               <el-menu-item index="/stuff">员工</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-submenu index="2">
+          <el-submenu index="2"  v-if="user.group === '零件仓库' || user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>零件管理</span>
@@ -46,17 +46,17 @@
             </el-menu-item-group>
 
           </el-submenu>
-          <el-submenu index="3">
+          <el-submenu index="3" v-if="user.group === '计划部'|| user.group === '管理员'">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>计划部</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="/plan">计划管理</el-menu-item>
-
+              <el-menu-item index="/newplan">新增计划管理</el-menu-item>
+              <el-menu-item index="/oldplan">现有计划管理</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-submenu index="4">
+          <el-submenu index="4" v-if="user.group === '科技部'|| user.group === '管理员'">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>科技部</span>
@@ -67,7 +67,7 @@
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="4">
+          <el-submenu index="5" v-if="user.group === '生产部'|| user.group === '管理员'">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>生产车间</span>
