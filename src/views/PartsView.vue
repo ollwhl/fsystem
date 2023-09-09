@@ -5,9 +5,10 @@
 
     <el-table
         :data="tableData"
-        height="250"
+        height="1000"
         border
         style="width: 100%"
+        class="parts-table"
     >
       <el-table-column prop="name" label="零件名" width="180"></el-table-column>
       <el-table-column prop="num" label="数量" width="180"></el-table-column>
@@ -112,8 +113,8 @@ export default {
       const input = popoverName === 'add' ? row.addInput : row.redInput;
 
       request.post("parts/count", {
-        countNum: popoverName === 'add' ? input : -input, // 如果是入库操作，则传入正数，如果是出库操作，则传入负数
-        id: row.id, // 零件的ID，用于标识要操作的零件
+        confirm: popoverName === 'add' ? input : -input, // 如果是入库操作，则传入正数，如果是出库操作，则传入负数
+        name: row.name, // 零件的name，用于标识要操作的零件
 
       }).then(res => {
         if (res.code === '0') {
@@ -156,3 +157,11 @@ export default {
 
 }
 </script>
+
+
+<style scoped>
+/* 自定义 CSS 样式规则 */
+.parts-table {
+  width: 100%; /* 设置表格容器的宽度为100% */
+}
+</style>

@@ -191,11 +191,11 @@ export default {
       }
 
       // 假设零件 ID 存储在 row.id 中，您需要根据您的数据结构进行修改
-      const partId = row.id;
+      const partsName = row.name;
 
       // 向后端发送请求以确认收货
-      request.post("/parts/parts", {
-        partId: partId,
+      request.post("/parts/confirm", {
+        partsName: row.name,
         quantity: unreceived,
       }).then((res) => {
         if (res.code === '0') {
@@ -235,11 +235,11 @@ export default {
       }
 
       // 获取当前行的数据，假设零件 ID 存储在 currentRow.id 中
-      const partId = this.currentRow.id;
+      const partsName = this.currentRow.name;
 
       // 向后端发送请求以确认损耗
       request.post("/parts/loss", {
-        partId: partId,
+        partsName: partsName,
         quantity: lossQuantity,
       }).then((res) => {
         if (res.code === '0') {

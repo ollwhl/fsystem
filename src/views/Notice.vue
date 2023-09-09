@@ -1,20 +1,20 @@
 <template>
-  <div class="stuff-view">
+  <div class="notice-view">
     <div class="action-bar">
-      <el-input v-model="params.keyword" placeholder="请输入姓名或电话号码" :style="{ width: '50%' }"></el-input>
+      <el-input v-model="params.keyword" placeholder="请输入公告标题" :style="{ width: '50%' }"></el-input>
       <el-button type="warning" class="action-button" @click="search()">查询</el-button>
       <el-button type="primary" class="action-button" @click="add('dialogAddForm')">新增 </el-button>
     </div>
 
     <el-table :data="tableData":style="{ width: '100%' }" height="700">
-      <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-      <el-table-column prop="phone" label="电话" width="300"></el-table-column>
-      <el-table-column prop="group" label="部门" width="300"></el-table-column>
-      <el-table-column prop="note" label="附录" ></el-table-column>
+      <el-table-column prop="name" label="公告标题" width="120"></el-table-column>
+      <el-table-column prop="content" label="公告内容" width="300"></el-table-column>
+      <el-table-column prop="time" label="发布时间" width="300"></el-table-column>
+
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <div class="action-buttons">
-            <el-button type="primary" @click="edit(scope.row)">编辑</el-button>
+            <el-button type="danger" @click="showDeleteConfirm(scope.row)">删除</el-button>
 
           </div>
         </template>
@@ -32,30 +32,15 @@
       </el-pagination>
     </div>
     <div>
-      <el-dialog title="添加人员" :visible.sync="dialogAddFormVisible">
+      <el-dialog title="新增公告" :visible.sync="dialogAddFormVisible">
         <el-form :model="addForm">
-          <el-form-item label="人员名称" :label-width="formLabelWidth">
+          <el-form-item label="公告标题" :label-width="formLabelWidth">
             <el-input v-model="addForm.name" autocomplete="off" clearable></el-input>
           </el-form-item>
-          <el-form-item label="人员权限" :label-width="formLabelWidth">
-            <el-select v-model="addForm.group" placeholder="员工">
-              <el-option label="计划部" value="计划部"></el-option>
-              <el-option label="科技部" value="科技部"></el-option>
-              <el-option label="生产部" value="生产部"></el-option>
-              <el-option label="零件仓库" value="零件仓库"></el-option>
-              <el-option label="半成品仓库" value="半成品仓库"></el-option>
-              <el-option label="总成仓库" value="总成仓库"></el-option>
-            </el-select>
+          <el-form-item label="公告内容" :label-width="formLabelWidth">
+            <el-input type="textarea" v-model="addForm.content" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="密码" :label-width="formLabelWidth">
-            <el-input v-model="addForm.password" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="电话" :label-width="formLabelWidth">
-            <el-input v-model="addForm.phone" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="附录" :label-width="formLabelWidth">
-            <el-input v-model="addForm.note" autocomplete="off"></el-input>
-          </el-form-item>
+
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogAddFormVisible = false">取 消</el-button>
@@ -104,12 +89,9 @@ export default {
       total: 0,
 
       addForm:{
-        id: "",
+
         name: "",
-        group: "",
-        phone: "",
-        note: "",
-        password: "123456",
+        content:"",
       },
       successMsg:"",
       dialogAddFormVisible: false,
@@ -122,10 +104,10 @@ export default {
 
   methods:{
     load(){
-      const stuffUrl="user/stuff"
-      request.get(stuffUrl,{
+      const noticeUrl="user/notice"
+      request.get(noticeUrl,{
         params: this.params
-      }).then(res=> {//使用get方法请求/amdin
+      }).then(res=> {
         if (res.code === '0'){
           this.tableData =res.data.list
           this.total =res.data.total
@@ -141,7 +123,7 @@ export default {
       this.load()
     },
     search(){
-      request.get("user/stuff/search",{
+      request.get("user/notice/search",{
         params: this.params
       }).then(res => {
         if (res.code === '0') {
@@ -157,19 +139,53 @@ export default {
       this[`${dialogName}Visible`] = true
       this.successMsg = "添加成功"
     },
-    edit(obj){
-      this.addForm = obj
-      this.dialogAddFormVisible=true
-      this.successMsg = "修改成功"
+    // 显示删除确认对话框
+    showDeleteConfirm(row) {
+      this.$confirm('确定要删除这条公告吗?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+          .then(() => {
+            // 用户点击了确定按钮，执行删除操作
+            this.deleteNotice(row);
+          })
+          .catch(() => {
+            // 用户点击了取消按钮，取消删除操作
+          });
     },
+
+    // 删除公告
+    deleteNotice(row) {
+      const noticeId = row.id; // 假设您的公告有一个唯一的标识符
+
+      // 向后端发送删除请求
+      // 请替换以下示例中的请求方法和URL
+      request.delete(`user/notice/${noticeId}`)
+          .then((res) => {
+            if (res.code === '0') {
+              this.$message({
+                type: 'success',
+                message: '删除成功',
+              });
+              // 删除成功后，刷新公告列表
+              this.load();
+            } else {
+              this.$message.error('删除失败');
+            }
+          })
+          .catch((error) => {
+            this.$message.error('删除失败');
+            console.error('删除请求失败：', error);
+          });
+    },
+
+
     submitAddForm(dialogName){
-      request.post("user/add",{
+      request.post("notice/add",{
         name: this.addForm.name,
-        group: this.addForm.group,
-        note: this.addForm.note,
-        password: this.addForm.password,
-        phone: this.addForm.phone,
-        id: this.addForm.id
+        content: this.addForm.content,
+
       }).then(res =>{
         if(res.code === '0'){
           this[`${dialogName}Visible`] = false

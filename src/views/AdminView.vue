@@ -3,7 +3,7 @@
     <div class="action-bar">
       <el-input v-model="params.keyword" placeholder="请输入姓名或电话号码" :style="{ width: '50%' }"></el-input>
       <el-button type="warning" class="action-button" @click="search()">查询</el-button>
-      <el-button type="primary" class="action-button" @click="add('dialogAddForm')">新增 </el-button>
+      <el-button type="primary" class="action-button" @click="add('dialogAddForm')">新增</el-button>
     </div>
 
     <el-table :data="tableData":style="{ width: '100%' }" height="700">
@@ -19,6 +19,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <div class="block">
       <el-pagination
               @size-change="handleSizeChange"

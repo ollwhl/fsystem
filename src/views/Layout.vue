@@ -33,6 +33,7 @@
             <el-menu-item-group>
               <el-menu-item index="/admin">管理员</el-menu-item>
               <el-menu-item index="/stuff">员工</el-menu-item>
+              <el-menu-item index="/notice">系统公告</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
           <el-submenu index="2"  v-if="user.group === '零件仓库' || user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'">
@@ -56,6 +57,7 @@
               <el-menu-item index="/oldplan">现有计划管理</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
+
           <el-submenu index="4" v-if="user.group === '科技部'|| user.group === '管理员'">
             <template slot="title">
               <i class="el-icon-location"></i>
@@ -77,6 +79,8 @@
 
             </el-menu-item-group>
           </el-submenu>
+
+
 
         </el-menu>
       </el-aside>

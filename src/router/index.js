@@ -64,7 +64,12 @@ const routes = [
         path: '/oldplan',
         name: 'oldPlan',
         component: () => import('../views/oldPlanview.vue')
-      }
+      },
+    {
+      path: '/notice',
+      name: 'notice',
+    component: () => import('../views/Notice.vue')
+    },
     ]
   },
 

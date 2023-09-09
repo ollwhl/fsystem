@@ -1,94 +1,109 @@
 <template>
-  <div>
-    <el-button @click="openDialog" type="primary">打开弹窗</el-button>
+  <div class="notice-view">
+    <div class="action-bar">
+      <el-input v-model="params.keyword" placeholder="请输入姓名或操作" :style="{ width: '25%' }"></el-input>
+      <el-button type="warning" class="action-button" @click="search()">查询</el-button>
+    </div>
 
-    <el-dialog :visible.sync="dialogData.dialogVisible" title="自动生成输入框和自动检查">
-      <div>
-        <div style="display: flex; align-items: center;">
-          <span style="margin-right: 12px;">产品名：</span>
-          <el-input v-model="dialogData.inputText" @input="handleInput" placeholder="在这里输入内容" />
-        </div>
-        <span>{{ dialogData.checkMessage }}</span>
-        <div v-for="(text, index) in dialogData.inputList" :key="index">
-          <div style="display: flex; align-items: center;">
-            <span style="margin-right: 10px;">输入框 {{ index + 2 }}：</span>
-            <el-input v-model="dialogData.inputList[index]" @input="handleInputForAddedInput(index)" :placeholder="'输入框 ' + (index + 2)" />
-            <span>{{ dialogData.checkMessages[index] }}</span>
-          </div>
-        </div>
-        <div style="text-align: center; margin-top: 20px;">
-          <el-button type="primary" @click="addInputBox">新增输入框</el-button>
-          <el-button type="success" @click="submitForm">提交表格</el-button>
-        </div>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="closeDialog">关闭</el-button>
-      </span>
-    </el-dialog>
+    <el-table :data="tableData":style="{ width: '100%' }" height="700">
+      <el-table-column prop="name" label="姓名" width="120"></el-table-column>
+      <el-table-column prop="logmsg" label="操作信息" width="300"></el-table-column>
+      <el-table-column prop="time" label="操作时间" width="300"></el-table-column>
+    </el-table>
+    <div class="block">
+      <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="params.pageNum"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="params.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
+      </el-pagination>
+    </div>
+
   </div>
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        dialogData: {
-          dialogVisible: false,
-          inputText: '',
-          inputList: [''], // 初始有一个输入框
-          checkMessage: '', // 存储检查后的消息
-          checkMessages: ['','','','','']
-        },
-        timeoutIds: [] // 存储每个输入框的计时器ID
-      };
-    },
-    methods: {
-      openDialog() {
-        this.dialogData.dialogVisible = true;
-      },
-      handleInput() {
-        clearTimeout(this.timeoutIds[0]);
-        this.timeoutIds[0] = setTimeout(() => {
-          this.performCheck();
-        }, 3000);
-      },
-      handleInputForAddedInput(index) {
-        clearTimeout(this.timeoutIds[index + 1]);
-        this.timeoutIds[index + 1] = setTimeout(() => {
-          this.performCheckForAddedInput(index);
-        }, 3000);
-      },
-      performCheck() {
-        // 模拟检查操作
-        this.dialogData.checkMessage = '检查完成';
-        setTimeout(() => {
-          this.dialogData.checkMessage = ''; // 清除消息
-        }, 2000);
-      },
-      performCheckForAddedInput(index) {
-        // 模拟检查操作
-        this.dialogData.checkMessages[index] = (index + '检查完成');
-        console.log(index + this.dialogData.checkMessages[index]);
+<style>
+.admin-view {
+  padding: 20px;
+}
 
-        setTimeout(() => {
-          this.dialogData.checkMessages[index] = ""; // 清除消息
-        }, 2000);
-        console.log(index + this.dialogData.checkMessages[index]);
+.action-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.action-button {
+  margin-left: 10px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+</style>
+
+<script>
+import request from "@/utils/request";
+
+export default {
+  name: "logView",
+  data() {
+    return {
+      params:{
+        keyword:"",
+        pageNum: 1,
+        pageSize: 10,
       },
-      addInputBox() {
-        if (this.dialogData.inputList.length < 5) {
-          this.dialogData.inputList.push('');
-          this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
-        }
-      },
-      submitForm() {
-        // 提交表格的逻辑
-        console.log('表格已提交');
-      },
-      closeDialog() {
-        this.dialogData.dialogVisible = false;
-        this.timeoutIds = []; // 关闭弹窗时清除计时器ID
-      }
+
+      tableData: [],
+      total: 0,
+      successMsg:"",
+      dialogAddFormVisible: false,
+      formLabelWidth: '120px',
     }
-  };
+  },
+  created() {//页面创建时调用的方法
+    this.load()
+  },
+
+  methods:{
+    load(){
+      const noticeUrl="parts/log"
+      request.get(noticeUrl,{
+        params: this.params
+      }).then(res=> {
+        if (res.code === '0'){
+          this.tableData =res.data.list
+          this.total =res.data.total
+        }
+      })
+    },
+    handleSizeChange(pageSize){
+      this.params.pageSize = pageSize
+      this.load()
+    },
+    handleCurrentChange(pageNum){
+      this.params.pageNum = pageNum
+      this.load()
+    },
+    search(){
+      request.get("parts/log/search",{
+        params: this.params
+      }).then(res => {
+        if (res.code === '0') {
+          this.tableData = res.data.list
+          this.total =res.data.total
+        }else{
+
+        }
+      })
+    }
+
+
+  }
+}
 </script>
