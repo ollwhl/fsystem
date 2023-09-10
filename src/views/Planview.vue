@@ -15,6 +15,8 @@
           <el-input v-model="addRow.planNum"></el-input>
         </el-form-item>
         <el-form-item label="截止日期">
+          <!-- Use el-date-picker for selecting a date -->
+          <el-date-picker v-model="addRow.planDate" type="date" placeholder="选择日期"></el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer">

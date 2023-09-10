@@ -143,28 +143,7 @@ export default {
     },
 
 
-// 打开新增弹窗
-    openAddDialog() {
-      this.addRow = {}; // 清空新增数据
-      this.addVisible = true;
-    },
-    // 取消新增
-    cancelAdd() {
-      this.addVisible = false;
-    },
-    // 保存新增
-    saveAdd() {
-      request.post("plan/addPlan", this.addRow).then((res) => {
-        if (res.code === "0") {
-          this.$message.success("新增计划成功");
-          this.addVisible = false;
-          // 如果需要，你可能需要重新加载数据以更新表格
-          this.load();
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
-    },
+
     cancel(row, popoverName) {
       row[`${popoverName}Visible`] = false;
     },
