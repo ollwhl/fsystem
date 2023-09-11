@@ -9,7 +9,7 @@
       <el-form :model="addRow" ref="addForm" label-width="100px">
 
         <el-form-item label="产品名称">
-          <el-input v-model="addRow.name"></el-input>
+          <el-input v-model="addRow.name":disabled="true"></el-input>
         </el-form-item>
         <el-form-item label="数量">
           <el-input v-model="addRow.planNum"></el-input>
@@ -43,17 +43,7 @@
 
 
         <template slot-scope="scope">
-          <el-button type="primary" @click="editPlan(scope.row)">修改</el-button>
-          <el-popover placement="top" width="160" v-model="scope.row.delVisible">
-            <p>确定删除吗？</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancel(scope.row,'del')">取消</el-button>
-              <el-button type="primary" size="mini" @click="delPlan(scope.row)">确定</el-button>
-            </div>
-            <el-button slot="reference" style="margin-left: 10px">删除</el-button>
-            <el-button type="primary" class="action-button" @click="openAddDialog">新增</el-button>
-          </el-popover>
-
+          <el-button type="primary" class="action-button" @click="openAddDialog(scope.row)">新增</el-button>
         </template>
 
 
@@ -177,9 +167,9 @@ export default {
 
 
 // 打开新增弹窗
-    openAddDialog() {
+    openAddDialog(row) {
       this.addRow = {
-        name: productName,
+        name: row.name,
         planNum: '',
         planDate: ''
       }; // 清空新增数据
@@ -191,7 +181,6 @@ export default {
     },
     // 保存新增
     saveAdd() {
-      this.addROw.name = this.name;
       request.post("plan/editPlan", this.addRow
 
       ).then((res) => {

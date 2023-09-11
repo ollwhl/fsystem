@@ -31,7 +31,7 @@
       <el-table-column prop="partsName" label="零件名"></el-table-column>
       <el-table-column prop="usedParts" label="已使用"></el-table-column>
       <el-table-column prop="partsNum"  label="零件库存"></el-table-column>
-      <el-table-column prop="unreceived" label="未收货"></el-table-column>
+      <el-table-column prop="confirm" label="未收货"></el-table-column>
 
 
       <el-table-column label="操作" width="200">

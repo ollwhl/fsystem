@@ -3,11 +3,18 @@
     <h1 >Welcome, {{ user.name }}! Role: {{ user.group }}</h1>
     <div class="system-announcements">
       <h2>公告</h2>
-      <el-table :data="tableData":style="{ width: '100%' }" height="700">
-        <el-table-column prop="name" label="公告标题" width="120"></el-table-column>
-        <el-table-column prop="content" label="公告内容" width="300"></el-table-column>
-        <el-table-column prop="time" label="发布时间" width="300"></el-table-column>
-      </el-table>
+      <div v-for="(item, index) in tableData" :key="index">
+        <!-- 在这里渲染每个项目 -->
+        <el-card class="box-card">
+          <div slot="header" class="clearfix">
+            <span>{{ item.title }}</span>
+            <span style="float: right; padding: 3px 0; font-size: 12px" type="text">{{item.time}}</span>
+          </div>
+          <div class="text item">
+            {{item.msg}}
+          </div>
+        </el-card>
+      </div>
     </div>
   </div>
 </template>
@@ -47,9 +54,13 @@ export default {
   },
   methods: {
     load() {
-      const noticeUrl = "user/notice";
-      request.get(noticeUrl, {
-        params: this.params,
+      const noticeUrl = "notice";
+      request.get(noticeUrl,{
+        params:{
+          keyword:"",
+          pageNum: 1,
+          pageSize: 10,
+        },
       }).then((res) => {
         if (res.code === '0') {
           // 更新tableData和total变量

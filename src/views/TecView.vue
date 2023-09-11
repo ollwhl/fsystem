@@ -8,7 +8,7 @@
     ></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
     <el-button type="primary" class="action-button" @click="openDialog">新增产品</el-button>
-    <el-button type="primary" class="action-button" @click="openPartsDialog">新增零件</el-button>
+<!--    <el-button type="primary" class="action-button" @click="openPartsDialog">新增零件</el-button>-->
 
     <template>
       <div>
@@ -32,8 +32,12 @@
                 <el-input v-model="dialogData.numList[index]" @input="handleInputForAddedNum(index)" :placeholder="'零件数量'" />
                 <el-button @click="removePart(index)" icon="el-icon-close"></el-button>
               </div>
+              <span>{{dialogData.checkPartsMessage}}</span>
+              <template v-if="dialogData.checkPartsMessage === '零件不存在'">
+                <el-button type="primary" class="action-button" @click="openPartsDialog(index)">新增零件</el-button>
+              </template>
             </div>
-            <span>{{dialogData.checkPartsMessage}}</span>
+
           </div>
           <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="addInputBox" :disabled="isDisabled">添加零件</el-button>
@@ -71,17 +75,33 @@
           <el-dialog :visible.sync="partDialogVisible" title="新增零件">
             <div>
               <div style="display: flex; align-items: center;">
+                <span style="margin-right: 12px;">零件编号：</span>
+                <el-input v-model="newPartsForm.id" :style="{ width: '50%' }" placeholder="在这里输入零件描述" />
+              </div>
+              <div style="display: flex; align-items: center;">
                 <span style="margin-right: 12px;">零件名：</span>
-                <el-input v-model="newPartName" :style="{ width: '50%' }" placeholder="在这里输入零件名" />
+                <el-input v-model="newPartsForm.name" :style="{ width: '50%' }" placeholder="在这里输入零件名" />
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="margin-right: 12px;">零件类型：</span>
+                <el-select v-model="newPartsForm.group" placeholder="零件">
+                  <el-option label="零件" value="零件仓库"></el-option>
+                  <el-option label="半成品" value="半成品仓库"></el-option>
+                </el-select>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="margin-right: 12px;">零件规格：</span>
+                <el-input v-model="newPartsForm.standard" :style="{ width: '50%' }" placeholder="在这里输入零件描述" />
               </div>
               <div style="display: flex; align-items: center;">
                 <span style="margin-right: 12px;">零件描述：</span>
-                <el-input v-model="newPartDescription" :style="{ width: '50%' }" placeholder="在这里输入零件描述" />
+                <el-input v-model="newPartsForm.note" :style="{ width: '50%' }" placeholder="在这里输入零件描述" />
               </div>
+
             </div>
             <span slot="footer" class="dialog-footer">
-    <el-button type="primary" @click="addNewPart">确定</el-button>
-    <el-button @click="closePartDialog">取消</el-button>
+    <el-button type="primary" @click="submitAddPartsForm">确定</el-button>
+    <el-button @click="partDialogVisible = false">取消</el-button>
   </span>
           </el-dialog>
 
@@ -145,6 +165,17 @@ export default {
         partsName:"",
         num:"",
       },
+
+      partDialogVisible:false,
+      newPartsForm:{
+        id:"",
+        name:"",
+        standard:"",
+        note:"",
+        group:"",
+      },
+
+
       //edit
       editVisible: false,
       editRow: {},
@@ -155,9 +186,13 @@ export default {
         partNameList: [''], // 初始有一个输入框
         numList: [''],
         checkMessage: '', // 存储检查后的消息
-        checkPartsMessage: ""
+        checkPartsMessage: "",
+        productStandard: "",
+        productDescription: ""
       },
+
       showProductDetails: true,
+      showPartsDetails:true,
 
 
       successMsg: "",
@@ -169,9 +204,9 @@ export default {
     this.load()
   },
   computed: {
-    isDisabled() {
-      return this.dialogData.checkPartsMessage === "零件不存在"
-    }
+    // isDisabled() {
+    //   return this.dialogData.checkPartsMessage === "零件不存在"
+    // }
   },
   methods: {
     // +-----------------------------------+
@@ -237,7 +272,7 @@ export default {
         checkMessage: '', // 存储检查后的消息
         checkPartsMessage: ""
       },
-      this.dialogData.dialogVisible = true;
+              this.dialogData.dialogVisible = true;
     },
     handleInput() {
       const productName = this.dialogData.productName;
@@ -260,22 +295,20 @@ export default {
       request.get(`parts/findPartsByName?name=${partsName}`)
               .then(res => {
                 if (res.code === '0') {
-                  this.dialogData.checkPartsMessage="零件存在"
+                  this.dialogData.checkPartsMessage = "零件存在"
                   console.log("ok")
                 } else {
-                  this.dialogData.checkPartsMessage="零件不存在"
+                  this.dialogData.checkPartsMessage = "零件不存在"
                   console.log(" no ok")
                 }
               });
     },
-    handleInputForAddedNum(index){
+    handleInputForAddedNum(index) {
     },
     addInputBox() {
-      if (this.dialogData.partNameList.length < 5) {
         this.dialogData.partNameList.push('');
         this.dialogData.numList.push('');
         this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
-      }
     },
     removePart(index) {
       this.dialogData.partNameList.splice(index, 1);
@@ -283,19 +316,19 @@ export default {
     },
     submitForm() {//提交产品零件
       for (let i = 0; i < this.dialogData.partNameList.length; i++) {
-        request.post("tech/addTechRow",{
+        request.post("tech/addTechRow", {
           productName: this.dialogData.productName,
           partsName: this.dialogData.partNameList[i],
           num: this.dialogData.numList[i]
         }).then(
-                res=>{
-                  if(res.code === '0'){
+                res => {
+                  if (res.code === '0') {
                     this.$message({
-                      message:"提交成功",
-                      type:"success"
+                      message: "提交成功",
+                      type: "success"
                     });
-                    this.dialogData.dialogVisible=false;
-                  }else{
+                    this.dialogData.dialogVisible = false;
+                  } else {
                     this.$message.error(res.msg);
                   }
                 }
@@ -307,6 +340,40 @@ export default {
       this.dialogData.dialogVisible = false;
       this.timeoutIds = []; // 关闭弹窗时清除计时器ID
     },
+
+    openPartsDialog(index){
+      const partsName = this.dialogData.partNameList[index];
+      this.newPartsForm={}
+      this.newPartsForm.name = partsName
+      this.newPartsForm.group = "零件仓库"
+      this.partDialogVisible = true;
+    },
+    submitAddPartsForm() {//提交表单调用该方法
+      request.post("parts/addParts", {
+        id:this.newPartsForm.id,
+        name:this.newPartsForm.name,
+        group:this.newPartsForm.group,
+        standard:this.newPartsForm.standard,
+        note:this.newPartsForm.note
+      }).then(res => {
+        if (res.code === '0') {
+          this.partDialogVisible = false
+          this.dialogData.checkPartsMessage = "零件存在"
+          this.$message({
+            message: this.successMsg,
+            type: 'success'
+          });
+        } else {
+          this.$message({
+            message: res.msg,
+            type: 'error'
+          });
+        }
+
+      })
+    },
+
+
 
     //这tm干啥用的
     submitAddForm(dialogName) {//提交表单调用该方法
@@ -330,12 +397,11 @@ export default {
       })
       location.reload();
     },
-
     edit(row){
       // 将行数据复制到编辑行数据中
       this.editRow = { ...row };
       this.editVisible = true;
-},
+    },
     cancelEdit() {
       this.editVisible = false; // 关闭编辑弹窗
     },

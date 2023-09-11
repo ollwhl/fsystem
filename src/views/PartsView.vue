@@ -14,8 +14,8 @@
       <el-table-column prop="num" label="数量" width="180"></el-table-column>
       <el-table-column prop="standard" label="规格"></el-table-column>
       <el-table-column prop="group" label="仓库"></el-table-column>
-      <el-table-column prop="confirm" label="交付确认"></el-table-column>
-      <el-table-column prop="min"  label="警戒值"></el-table-column>
+      <el-table-column prop="confirm" label="等待交付确认"></el-table-column>
+      <el-table-column prop="min"  label="当前所需零件数量"></el-table-column>
       <el-table-column prop="note" label="备注"></el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">

@@ -6,9 +6,10 @@
     </div>
 
     <el-table :data="tableData":style="{ width: '100%' }" height="700">
-      <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-      <el-table-column prop="logmsg" label="操作信息" width="300"></el-table-column>
+      <el-table-column prop="userName" label="姓名" width="120"></el-table-column>
+      <el-table-column prop="logMsg" label="操作信息" width="300"></el-table-column>
       <el-table-column prop="time" label="操作时间" width="300"></el-table-column>
+      <el-table-column prop="ip" label="ip地址" width="300"></el-table-column>
     </el-table>
     <div class="block">
       <el-pagination
@@ -72,7 +73,7 @@ export default {
 
   methods:{
     load(){
-      const noticeUrl="parts/log"
+      const noticeUrl="log"
       request.get(noticeUrl,{
         params: this.params
       }).then(res=> {
@@ -91,7 +92,7 @@ export default {
       this.load()
     },
     search(){
-      request.get("parts/log/search",{
+      request.get("log/search",{
         params: this.params
       }).then(res => {
         if (res.code === '0') {
