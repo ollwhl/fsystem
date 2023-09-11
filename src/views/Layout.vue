@@ -31,19 +31,21 @@
               <span>人员管理</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="/admin">管理员</el-menu-item>
-              <el-menu-item index="/stuff">员工</el-menu-item>
+              <el-menu-item index="/admin">员工</el-menu-item>
+
               <el-menu-item index="/notice">系统公告</el-menu-item>
+
             </el-menu-item-group>
           </el-submenu>
-          <el-submenu index="2"  v-if="user.group === '零件仓库' || user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'">
+          <el-submenu index="2"  >
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>零件管理</span>
+              <span>仓库管理</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="/parts">零件库存</el-menu-item>
-              <el-menu-item index="/log">修改日志</el-menu-item>
+              <el-menu-item index="/parts" v-if="user.group === '零件仓库' || user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'">零件库存</el-menu-item>
+              <el-menu-item index="/log"　 v-if="user.group === '管理员'">修改日志</el-menu-item>
+              <el-menu-item index="/product" >产品库存</el-menu-item>
             </el-menu-item-group>
 
           </el-submenu>

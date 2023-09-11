@@ -2,7 +2,7 @@
   <div>
     <el-input v-model="params.keyword" :style="{ width: '50%' }" placeholder="请输入计划名称"></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
-    <el-button type="primary" class="action-button" @click="openAddDialog">新增</el-button>
+
 
     <!-- 新增弹窗 -->
     <el-dialog :visible.sync="addVisible" title="新增计划">
@@ -35,7 +35,8 @@
     >
 <!--      <el-table-column prop="name" label="产品名称" width="180"></el-table-column>-->
       <el-table-column prop="name" label="产品名称" width="180"></el-table-column>
-      <el-table-column prop="planNum" label="数量"></el-table-column>
+      <el-table-column prop="produced" label="已完成数量"></el-table-column>
+      <el-table-column prop="planNum" label="计划数量"></el-table-column>
       <el-table-column prop="planDate" label="截止期限"></el-table-column>
 
       <el-table-column label="操作" width="200">
@@ -50,6 +51,7 @@
               <el-button type="primary" size="mini" @click="delPlan(scope.row)">确定</el-button>
             </div>
             <el-button slot="reference" style="margin-left: 10px">删除</el-button>
+            <el-button type="primary" class="action-button" @click="openAddDialog">新增</el-button>
           </el-popover>
 
         </template>
@@ -64,9 +66,7 @@
         <el-form-item label="计划数量">
           <el-input v-model="editRow.planNum"></el-input>
         </el-form-item>
-        <el-form-item label="已完成数量">
-          <el-input v-model="editRow.madeNum"></el-input>
-        </el-form-item>
+
         <el-form-item label="截止日期">
           <el-input v-model="editRow.planDate"></el-input>
         </el-form-item>
@@ -127,16 +127,30 @@ export default {
   created() {//页面创建时调用的方法
     this.load()
   },
+
   methods:{
-    load(){
-      request.get("plan/getPlan",{
-        params:this.params
-      }).then(res=>{
-        if(res.code==='0'){
-          this.tableData=res.data.list
-          this.total=res.data.total
-        }
-      })
+    load() {
+      // 先请求获取产品数据
+      // request.get("parts/getProduct").then(productRes => {
+      //   if (productRes.code === '0') {
+      //     // 保存产品数据到 name 变量
+      //     this.name = productRes.data; // 假设产品数据存储在 data 字段中
+      //   } else {
+      //     this.$message.error(productRes.msg);
+      //   }
+
+        // 然后请求获取计划数据
+        request.get("parts/getProduct", {
+          params: this.params
+        }).then(planRes => {
+          if (planRes.code === '0') {
+            this.tableData = planRes.data.list;
+            this.total = planRes.data.total;
+          } else {
+            this.$message.error(planRes.msg);
+          }
+        });
+      // });
     },
     // 打开编辑弹窗，并将要编辑的行数据保存到 editRow 变量中
     editPlan(row) {
@@ -164,7 +178,11 @@ export default {
 
 // 打开新增弹窗
     openAddDialog() {
-      this.addRow = {}; // 清空新增数据
+      this.addRow = {
+        name: productName,
+        planNum: '',
+        planDate: ''
+      }; // 清空新增数据
       this.addVisible = true;
     },
     // 取消新增
@@ -173,6 +191,7 @@ export default {
     },
     // 保存新增
     saveAdd() {
+      this.addROw.name = this.name;
       request.post("plan/editPlan", this.addRow
 
       ).then((res) => {

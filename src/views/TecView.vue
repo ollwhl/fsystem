@@ -376,35 +376,7 @@ export default {
 
     //new part add
 
-    openPartDialog() {
-      this.partDialogVisible = true; // 打开新增零件弹窗
-      this.newPartName = ""; // 清空新零件名称输入框
-      this.newPartDescription = ""; // 清空新零件描述输入框
-    },
-    addNewPart() {
-      const newPartName = this.newPartName;
-      const newPartDescription = this.newPartDescription;
 
-      // 在这里可以执行新增零件的逻辑，例如向服务器发送请求
-      // 以下是一个示例，你需要根据实际需求修改
-      request.post("parts/addPart", {
-        name: newPartName,
-        description: newPartDescription,
-      }).then((res) => {
-        if (res.code === '0') {
-          this.$message.success("新增零件成功");
-          // 在这里可以刷新零件列表或执行其他操作
-        } else {
-          this.$message.error(res.msg);
-        }
-      });      this.partDialogVisible = false;
-    },
-
-    closePartDialog() {
-      // 关闭新增零件弹窗
-      this.partDialogVisible = false;
-    },
-  },
 
 
 

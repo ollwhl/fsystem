@@ -14,8 +14,16 @@
     >
       <!--      <el-table-column prop="name" label="产品名称" width="180"></el-table-column>-->
       <el-table-column prop="name" label="产品名称" width="180"></el-table-column>
-      <el-table-column prop="planNum" label="计划数量"></el-table-column>
-      <el-table-column prop="madeNum" label="已完成数量"></el-table-column>
+      <el-table-column prop="planNum" label="计划数量">
+        <template slot-scope="scope">
+          <span :style="{ color: 'red' }">{{ scope.row.planNum }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="produced" label="已生产数量">
+        <template slot-scope="scope">
+          <span :style="{ color: 'blue' }">{{ scope.row.produced }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="planDate" label="截止期限"></el-table-column>
 
       <el-table-column label="操作" width="200">
@@ -45,7 +53,7 @@
           <el-input v-model="editRow.planNum"></el-input>
         </el-form-item>
           <el-form-item label="已完成数量">
-            <el-input v-model="editRow.madeNum"></el-input>
+            <el-input v-model="editRow.produced"></el-input>
           </el-form-item>
             <el-form-item label="截止日期">
               <el-input v-model="editRow.planDate"></el-input>

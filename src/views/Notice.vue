@@ -7,8 +7,8 @@
     </div>
 
     <el-table :data="tableData":style="{ width: '100%' }" height="700">
-      <el-table-column prop="name" label="公告标题" width="120"></el-table-column>
-      <el-table-column prop="content" label="公告内容" width="300"></el-table-column>
+      <el-table-column prop="title" label="公告标题" width="120"></el-table-column>
+      <el-table-column prop="msg" label="公告内容" width="300"></el-table-column>
       <el-table-column prop="time" label="发布时间" width="300"></el-table-column>
 
       <el-table-column label="操作" width="200">
@@ -35,10 +35,10 @@
       <el-dialog title="新增公告" :visible.sync="dialogAddFormVisible">
         <el-form :model="addForm">
           <el-form-item label="公告标题" :label-width="formLabelWidth">
-            <el-input v-model="addForm.name" autocomplete="off" clearable></el-input>
+            <el-input v-model="addForm.title" autocomplete="off" clearable></el-input>
           </el-form-item>
           <el-form-item label="公告内容" :label-width="formLabelWidth">
-            <el-input type="textarea" v-model="addForm.content" autocomplete="off"></el-input>
+            <el-input type="textarea" v-model="addForm.msg" autocomplete="off"></el-input>
           </el-form-item>
 
         </el-form>
@@ -89,9 +89,8 @@ export default {
       total: 0,
 
       addForm:{
-
-        name: "",
-        content:"",
+        title: "",
+        msg:"",
       },
       successMsg:"",
       dialogAddFormVisible: false,
@@ -104,7 +103,7 @@ export default {
 
   methods:{
     load(){
-      const noticeUrl="user/notice"
+      const noticeUrl="notice"
       request.get(noticeUrl,{
         params: this.params
       }).then(res=> {
@@ -123,7 +122,7 @@ export default {
       this.load()
     },
     search(){
-      request.get("user/notice/search",{
+      request.get("/notice/search",{
         params: this.params
       }).then(res => {
         if (res.code === '0') {
@@ -157,11 +156,11 @@ export default {
 
     // 删除公告
     deleteNotice(row) {
-      const noticeId = row.id; // 假设您的公告有一个唯一的标识符
-
       // 向后端发送删除请求
       // 请替换以下示例中的请求方法和URL
-      request.delete(`user/notice/${noticeId}`)
+      request.post(`/notice/delNotice`,{
+        title:row.title
+      })
           .then((res) => {
             if (res.code === '0') {
               this.$message({
@@ -182,9 +181,10 @@ export default {
 
 
     submitAddForm(dialogName){
-      request.post("notice/add",{
-        name: this.addForm.name,
-        content: this.addForm.content,
+      console.log(this.addForm.title)
+      request.post("notice/addNotice",{
+        title: this.addForm.title,
+        msg: this.addForm.msg,
 
       }).then(res =>{
         if(res.code === '0'){

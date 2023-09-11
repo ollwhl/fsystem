@@ -29,17 +29,22 @@ const routes = [
         component: AdminView,
       },
 
-  {
-    path: '/stuff',
-    name: 'stuff',
-    component: () => import( '../views/StuffView.vue')
-  },
+
 
   {
     path: '/log',
     name: 'log',
     component: () => import('../views/LogView.vue')
   },
+
+
+      {
+        path: '/product',
+        name: 'product',
+        component: () => import('../views/ProductView.vue')
+      },
+
+
       {
         path: '/factory',
         name: 'Factory',

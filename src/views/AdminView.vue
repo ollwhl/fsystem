@@ -117,7 +117,7 @@
 
     methods:{
       load(){
-        request.get("user/admin",{//get获取
+        request.get("user",{//get获取
           params: this.params
         }).then(res=> {//使用get方法请求/amdin
           if (res.code === '0'){
