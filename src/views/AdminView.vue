@@ -14,7 +14,7 @@
         <template slot-scope="scope">
           <div class="action-buttons">
             <el-button type="primary" @click="edit(scope.row)">编辑</el-button>
-            <el-button type="danger">显示密码</el-button>
+
           </div>
         </template>
       </el-table-column>

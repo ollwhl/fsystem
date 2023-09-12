@@ -1,7 +1,46 @@
 <template>
   <div>
+    <div class="container">
     <el-input v-model="params.keyword"   :style="{ width: '50%' }" placeholder="输入零件名"></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
+    <el-button type="action" class="action-button" @click="openStockOrderDialog">备货单生成</el-button>
+
+    </div>
+    <el-dialog
+        :visible.sync="stockOrderVisible"
+        title="备货单"
+        :width="'80%'"
+    >
+      <el-table
+          :data="stockOrderList"
+          height="300"
+          border
+          style="width: 100%"
+      >
+        <!-- 在这里添加显示备货单的表格列 -->
+        <el-table-column prop="name" label="零件名"></el-table-column>
+        <el-table-column prop="id" label="编码"></el-table-column>
+        <el-table-column prop="num" label="数量"></el-table-column>
+        <el-table-column prop="min"  label="当前所需零件数量"></el-table-column>
+        <el-table-column prop="purchaseQuantity" label="进货量">
+        <template slot-scope="scope">
+          <span style="color: red;">{{ scope.row.purchaseQuantity }}</span>
+        </template>
+        </el-table-column>
+        <el-table-column prop="standard" label="规格"></el-table-column>
+        <!-- 其他需要显示的列 -->
+      </el-table>
+    </el-dialog>
+
+
+
+
+
+
+
+
+
+
 
     <el-table
         :data="tableData"
@@ -13,7 +52,9 @@
       <el-table-column prop="name" label="零件名" width="180"></el-table-column>
       <el-table-column prop="num" label="数量" width="180"></el-table-column>
       <el-table-column prop="standard" label="规格"></el-table-column>
+      <el-table-column prop="id" label="编码"></el-table-column>
       <el-table-column prop="group" label="仓库"></el-table-column>
+      <el-table-column prop="preWarn" label="备件数"></el-table-column>
       <el-table-column prop="confirm" label="等待交付确认"></el-table-column>
       <el-table-column prop="min"  label="当前所需零件数量"></el-table-column>
       <el-table-column prop="note" label="备注"></el-table-column>
@@ -50,8 +91,8 @@
           :total="total">
       </el-pagination>
     </div>
-  </div>
 
+  </div>
 </template>
 
 
@@ -71,6 +112,8 @@ export default {
       successMsg:"",
       addVisible: false,
       id:"",
+      stockOrderVisible: false, // 控制备货单弹窗显示状态
+      stockOrderList: [],// 用于存储符合条件的零件列表
       countNum:"",//出入库
       min:"",
       addInput:"",
@@ -136,6 +179,30 @@ export default {
       this.params.pageNum = pageNum
       this.load()
     },
+    //备货单生成
+    openStockOrderDialog() {
+      // 发起GET请求获取符合条件的零件列表
+      request.get("parts/getBuyList").then((res) => {
+        if (res.code === "0") {
+          // 计算进货量并添加到列表项中
+          this.stockOrderList = res.data.map((item) => ({
+            ...item,
+            purchaseQuantity: item.min - item.num, // 进货量为当前所需零件数量与数量的差
+          }));
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+
+      // 打开备货单弹窗
+      this.stockOrderVisible = true;
+    },
+
+
+
+
+
+
     search(){
       request.get("parts/search",{
         params:this.params
@@ -165,5 +232,8 @@ export default {
 /* 自定义 CSS 样式规则 */
 .parts-table {
   width: 100%; /* 设置表格容器的宽度为100% */
+}
+.container {
+  margin-bottom: 20px; /* 在底部添加20像素的外边距，根据需要调整间距大小 */
 }
 </style>

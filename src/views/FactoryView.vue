@@ -1,10 +1,16 @@
 <template>
   <div>
+    <div class="container">
     <el-input v-model="params.keyword" placeholder="输入产品名进行搜索合成表" :style="{ width: '25%' }"></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
 
     <el-button type="warning" class="action-button"@click="progressUpdateDialog">生产进度更新</el-button>
-    <el-dialog :visible.sync="progressUpdateVisible" title="生产进度更新" :width="'50%'" >
+      <el-button type="primary" @click="showProgress">显示生产进度</el-button>
+
+      <!-- 生产进度条 -->
+      <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
+    </div>
+      <el-dialog :visible.sync="progressUpdateVisible" title="生产进度更新" :width="'50%'" >
       <el-form :model="progressUpdateForm" ref="progressUpdateForm" label-width="100px" >
         <el-form-item label="产品名称">
           <el-input v-model="progressUpdateForm.productName" :style="{ width: '50%' }"></el-input>
@@ -12,21 +18,21 @@
         <el-form-item label="已生产数量">
           <el-input v-model.number="progressUpdateForm.produced" :style="{ width: '50%' }"></el-input>
         </el-form-item>
+
       </el-form>
       <div slot="footer">
         <el-button @click="cancelProgressUpdate">取消</el-button>
         <el-button type="primary" @click="submitProgressUpdate">保存</el-button>
       </div>
     </el-dialog>
-
     <el-table
         :data="tableData"
-        height="250"
+        height="750"
         border
         style="width: 100%"
     >
       <el-table-column prop="productName" label="产品名称" width="180"></el-table-column>
-      <el-table-column prop="productTarget" label="生产目标" width="180"></el-table-column>
+      <el-table-column prop="planNum" label="生产目标" width="180"></el-table-column>
       <el-table-column prop="produced" label="已生产"></el-table-column>
       <el-table-column prop="partsName" label="零件名"></el-table-column>
       <el-table-column prop="usedParts" label="已使用"></el-table-column>
@@ -92,7 +98,8 @@ export default {
       id:"",
       tableData: [],
 
-
+      showProgressbar: false, // 是否显示生产进度条
+      progressPercentage: 0, // 生产进度百分比
 
       lossDialogVisible: false, // 损耗确认弹窗显示状态
       lossQuantity: "0", // 损耗数量
@@ -110,21 +117,12 @@ export default {
   },
   methods:{
     load(){
-      const group = localStorage.getItem("group")
-      let url = null
-      if (group === "零件仓库") {
-        url = "/parts/getParts"
-      }else if (group === "半成品仓库"){
-        url = "/parts/getHalfProduct"
-      }else{
-        url = "/parts/getAllParts"
-      }
-      request.get(url,{
-        params:this.params
-      }).then(res=>{
-        if(res.code==='0'){
-          this.tableData=res.data.list
-          this.total=res.data.total
+      request.get("tech",{//get获取
+        params: this.params
+      }).then(res=> {//使用get方法请求/amdin
+        if (res.code === '0'){
+          this.tableData =res.data.list//更新表格
+          this.total =res.data.total//更新总条数
         }
       })
     },
@@ -164,8 +162,8 @@ export default {
         this.$message.error("请输入有效的产品名称和已生产数量");
         return;
       }
-      request.post("factory/update", {
-        productName: productName,
+      request.post("factory/dailyCheck", {
+        name: productName,
         produced: produced,
       }).then(res => {
         if (res.code === '0') {
@@ -194,7 +192,7 @@ export default {
       const partsName = row.name;
 
       // 向后端发送请求以确认收货
-      request.post("/parts/confirm", {
+      request.post("/factory/confirmArrive", {
         partsName: row.name,
         quantity: unreceived,
       }).then((res) => {
@@ -235,12 +233,12 @@ export default {
       }
 
       // 获取当前行的数据，假设零件 ID 存储在 currentRow.id 中
-      const partsName = this.currentRow.name;
+      const partsName = this.currentRow.partsName;
 
       // 向后端发送请求以确认损耗
-      request.post("/parts/loss", {
-        partsName: partsName,
-        quantity: lossQuantity,
+      request.post("factory/editLost", {
+        name: partsName,
+        lost: lossQuantity,
       }).then((res) => {
         if (res.code === '0') {
           this.$message.success("确认损耗成功。");
@@ -255,6 +253,20 @@ export default {
       this.lossQuantity = 0; // 清空损耗数量
     },
 
+// 显示生产进度条
+    showProgress() {
+      this.showProgressbar = true; // 设置为显示生产进度条
+      this.progressPercentage = 0; // 重置进度为0
+
+      // 模拟生产进度更新，实际中需要根据您的业务逻辑来更新进度
+      const interval = setInterval(() => {
+        if (this.progressPercentage < 100) {
+          this.progressPercentage += 10; // 每次增加10%
+        } else {
+          clearInterval(interval); // 达到100%后停止更新
+        }
+      }, 1000); // 更新频率，可以根据需要调整
+    },
 
 
 
@@ -288,4 +300,8 @@ export default {
   justify-content: space-between;
   margin-top: 5px; /* 添加上下间距 */
 }
+.container {
+  margin-bottom: 20px; /* 在底部添加20像素的外边距，根据需要调整间距大小 */
+}
+
 </style>

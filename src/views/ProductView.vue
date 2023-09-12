@@ -1,8 +1,10 @@
 <template>
   <div>
+    <div class="container">
     <el-input v-model="params.keyword"   :style="{ width: '50%' }" placeholder="输入产品名"></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
 
+    </div>
     <el-table
         :data="tableData"
         height="1000"
@@ -158,5 +160,8 @@ export default {
 /* 自定义 CSS 样式规则 */
 .parts-table {
   width: 100%; /* 设置表格容器的宽度为100% */
+}
+.container {
+  margin-bottom: 20px; /* 在底部添加20像素的外边距，根据需要调整间距大小 */
 }
 </style>

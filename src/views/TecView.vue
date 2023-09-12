@@ -1,4 +1,5 @@
 <template>
+
   <div>
     <el-input
         v-model="params.productName"
@@ -8,27 +9,33 @@
     ></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
     <el-button type="primary" class="action-button" @click="openDialog">新增产品</el-button>
-<!--    <el-button type="primary" class="action-button" @click="openPartsDialog">新增零件</el-button>-->
+    <!--    <el-button type="primary" class="action-button" @click="openPartsDialog">新增零件</el-button>-->
 
     <template>
       <div>
+
         <el-dialog :visible.sync="dialogData.dialogVisible" title="添加产品构成">
           <div>
             <div style="display: flex; align-items: center;">
               <span style="margin-right: 12px;">产品名：</span>
-              <el-input v-model="dialogData.productName" :style="{ width: '50%' }" @input="handleInput" placeholder="在这里输入内容" />
+              <el-input v-model="dialogData.productName" :style="{ width: '50%' ,marginBottom: '10px'}" @input="handleInput" placeholder="在这里输入内容" />
               <span>{{dialogData.checkMessage}}</span>
             </div>
             <template v-if="showProductDetails">
-              <el-input v-model="dialogData.productStandard" :style="{ width: '25%' }" placeholder="产品规格" />
-              <el-input v-model="dialogData.productDescription"  :style="{ width: '25%' }"placeholder="产品描述" />
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <el-input v-model="dialogData.productId" :style="{ width: '50%' ,marginBottom: '5px'}" placeholder="产品编号" />
+                <div style="width: 10px;"></div>
+              <el-input v-model="dialogData.productStandard" :style="{ width: '50%' ,marginBottom: '5px' }" placeholder="产品规格" />
+                <div style="width: 10px;"></div>
+              <el-input v-model="dialogData.productDescription"  :style="{ width: '50%' ,marginBottom: '5px'}"placeholder="产品描述" />
+              </div>
             </template>
             <div v-for="(text, index) in dialogData.partNameList" :key="index">
               <div style="display: flex; align-items: center;">
-                <span style="margin-right: 10px;">零件名 {{ index + 1 }}：</span>
-                <el-input v-model="dialogData.partNameList[index]" @input="handleInputForAddedInput(index)" :placeholder="'零件 ' + (index + 1)" />
+                <span style="margin-right: 10px;">零件 {{ index + 1 }}：</span>
+                <el-input v-model="dialogData.partNameList[index]" style="margin-right: 10px;" @input="handleInputForAddedInput(index)" :placeholder="'零件 ' + (index + 1)" />
 
-                <span style="margin-right: 10px;">零件数量：</span>
+                <span style="margin-right: 10px;">数量：</span>
                 <el-input v-model="dialogData.numList[index]" @input="handleInputForAddedNum(index)" :placeholder="'零件数量'" />
                 <el-button @click="removePart(index)" icon="el-icon-close"></el-button>
               </div>
@@ -57,10 +64,11 @@
        |                                                 |
        +-------------------------------------------------+
     -->
-    <el-table :data="tableData" :span-method="objectSpanMethod" border style="width: 100%">
+    <el-table :data="tableData" :span-method="objectSpanMethod" border style="width: 100%"  height="750">
       <el-table-column label="产品名称" prop="productName"></el-table-column>
       <el-table-column label="产品规格" prop="productStandard"></el-table-column>
       <el-table-column label="零件名" prop="partsName"></el-table-column>
+      <el-table-column prop="preWarn" label="备件数"></el-table-column>
       <el-table-column label="所需数量" prop="num"></el-table-column>
       <el-table-column label="所在仓库" prop="partsGroup"></el-table-column>
       <el-table-column label="操作">
@@ -74,29 +82,34 @@
 
           <el-dialog :visible.sync="partDialogVisible" title="新增零件">
             <div>
-              <div style="display: flex; align-items: center;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <span style="margin-right: 12px;">零件编号：</span>
-                <el-input v-model="newPartsForm.id" :style="{ width: '50%' }" placeholder="在这里输入零件描述" />
+                <el-input v-model="newPartsForm.id" :style="{ width: '48%' }"  placeholder="在这里输入零件描述" />
               </div>
-              <div style="display: flex; align-items: center;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <span style="margin-right: 12px;">零件名：</span>
-                <el-input v-model="newPartsForm.name" :style="{ width: '50%' }" placeholder="在这里输入零件名" />
+                <el-input v-model="newPartsForm.name" :style="{ width: '48%' }" placeholder="在这里输入零件名" />
               </div>
-              <div style="display: flex; align-items: center;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <span style="margin-right: 12px;">零件类型：</span>
-                <el-select v-model="newPartsForm.group" placeholder="零件">
+                <el-select v-model="newPartsForm.group" placeholder="零件" style="width: 48%;">
                   <el-option label="零件" value="零件仓库"></el-option>
                   <el-option label="半成品" value="半成品仓库"></el-option>
                 </el-select>
               </div>
-              <div style="display: flex; align-items: center;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <span style="margin-right: 12px;">零件规格：</span>
-                <el-input v-model="newPartsForm.standard" :style="{ width: '50%' }" placeholder="在这里输入零件描述" />
+                <el-input v-model="newPartsForm.standard" :style="{ width: '48%' }" placeholder="在这里输入零件描述" />
               </div>
-              <div style="display: flex; align-items: center;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <span style="margin-right: 12px;">备件数：</span>
+                <el-input v-model="newPartsForm.preWarn" :style="{ width: '48%' }" placeholder="在这里输入备件数" />
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
                 <span style="margin-right: 12px;">零件描述：</span>
-                <el-input v-model="newPartsForm.note" :style="{ width: '50%' }" placeholder="在这里输入零件描述" />
+                <el-input v-model="newPartsForm.note" :style="{ width: '48%' }" placeholder="在这里输入零件描述" />
               </div>
+
 
             </div>
             <span slot="footer" class="dialog-footer">
@@ -132,14 +145,31 @@
         <el-form-item label="零件数量">
           <el-input v-model.number="editRow.num"></el-input>
         </el-form-item>
+        <el-form-item label="备件数">
+          <el-input v-model.number="editRow.preWarn"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer">
         <el-button @click="cancelEdit">取消</el-button>
         <el-button type="primary" @click="saveEdit">保存</el-button>
       </div>
     </el-dialog>
+    <div class="block">
+      <span class="demonstration"></span>
+      <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="params.pageNum"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="params.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
+      </el-pagination>
+    </div>
   </div>
+
 </template>
+
 
 <script>
 import request from "@/utils/request";
@@ -160,7 +190,7 @@ export default {
 
       },
       addProductDialogVisible: false,
-       newProductForm: {
+      newProductForm: {
         productName: "",
         partsName:"",
         num:"",
@@ -171,6 +201,7 @@ export default {
         id:"",
         name:"",
         standard:"",
+        preWarn:"",
         note:"",
         group:"",
       },
@@ -183,6 +214,7 @@ export default {
       dialogData: {
         dialogVisible: false,
         productName: '',
+        productId:'',
         partNameList: [''], // 初始有一个输入框
         numList: [''],
         checkMessage: '', // 存储检查后的消息
@@ -272,66 +304,71 @@ export default {
         checkMessage: '', // 存储检查后的消息
         checkPartsMessage: ""
       },
-              this.dialogData.dialogVisible = true;
+          this.dialogData.dialogVisible = true;
     },
     handleInput() {
       const productName = this.dialogData.productName;
       request.get(`parts/findProductByName?name=${productName}`)
-              .then(res => {
-                if (res.code === '0') {
-                  this.dialogData.checkMessage = "产品已存在,新增构成";
-                  this.showProductDetails = false;
-                  //console.log("ok");
-                } else {
-                  this.dialogData.checkMessage = "新增产品";
-                  //console.log("not ok");
-                  this.showProductDetails = true;
-                }
-              });
+          .then(res => {
+            if (res.code === '0') {
+              this.dialogData.checkMessage = "产品已存在,新增构成";
+              this.showProductDetails = false;
+              //console.log("ok");
+            } else {
+              this.dialogData.checkMessage = "新增产品";
+              //console.log("not ok");
+              this.showProductDetails = true;
+            }
+          });
     },
 
     handleInputForAddedInput(index) {
       const partsName = this.dialogData.partNameList[index];
       request.get(`parts/findPartsByName?name=${partsName}`)
-              .then(res => {
-                if (res.code === '0') {
-                  this.dialogData.checkPartsMessage = "零件存在"
-                  console.log("ok")
-                } else {
-                  this.dialogData.checkPartsMessage = "零件不存在"
-                  console.log(" no ok")
-                }
-              });
+          .then(res => {
+            if (res.code === '0') {
+              this.dialogData.checkPartsMessage = "零件存在"
+              console.log("ok")
+            } else {
+              this.dialogData.checkPartsMessage = "零件不存在"
+              console.log(" no ok")
+            }
+          });
     },
     handleInputForAddedNum(index) {
     },
     addInputBox() {
-        this.dialogData.partNameList.push('');
-        this.dialogData.numList.push('');
-        this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
+      this.dialogData.partNameList.push('');
+      this.dialogData.numList.push('');
+      this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
     },
     removePart(index) {
       this.dialogData.partNameList.splice(index, 1);
       this.dialogData.numList.splice(index, 1);
     },
     submitForm() {//提交产品零件
+      if (!this.dialogData.productId) {
+        this.$message.error('产品编号不能为空');
+        return; // 如果产品编号为空，不执行后续操作
+      }
       for (let i = 0; i < this.dialogData.partNameList.length; i++) {
         request.post("tech/addTechRow", {
           productName: this.dialogData.productName,
+          productId: this.dialogData.productId,
           partsName: this.dialogData.partNameList[i],
           num: this.dialogData.numList[i]
         }).then(
-                res => {
-                  if (res.code === '0') {
-                    this.$message({
-                      message: "提交成功",
-                      type: "success"
-                    });
-                    this.dialogData.dialogVisible = false;
-                  } else {
-                    this.$message.error(res.msg);
-                  }
-                }
+            res => {
+              if (res.code === '0') {
+                this.$message({
+                  message: "提交成功",
+                  type: "success"
+                });
+                this.dialogData.dialogVisible = false;
+              } else {
+                this.$message.error(res.msg);
+              }
+            }
         )
       }
       //location.reload();
@@ -349,6 +386,12 @@ export default {
       this.partDialogVisible = true;
     },
     submitAddPartsForm() {//提交表单调用该方法
+      if (!this.newPartsForm.id) {
+        this.$message.error('零件编号不能为空');
+        return; // 如果零件编号为空，不执行后续操作
+      }
+
+
       request.post("parts/addParts", {
         id:this.newPartsForm.id,
         name:this.newPartsForm.name,
@@ -410,6 +453,7 @@ export default {
       // 提交编辑的逻辑，例如发送请求更新后端数据
       request.post("tech/edit",{
         id:this.editRow.id,
+        preWarn:this.editRow.preWarn,
         num:this.editRow.num,
       }).then(res=>
       {

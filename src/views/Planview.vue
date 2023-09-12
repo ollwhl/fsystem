@@ -1,8 +1,9 @@
 <template>
   <div>
+    <div class="container">
     <el-input v-model="params.keyword" :style="{ width: '50%' }" placeholder="请输入计划名称"></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
-
+　　　</div>
 
     <!-- 新增弹窗 -->
     <el-dialog :visible.sync="addVisible" title="新增计划">
@@ -29,7 +30,7 @@
 
     <el-table
         :data="tableData"
-        height="250"
+        height="1000"
         border
         style="width: 100%"
     >
@@ -240,3 +241,10 @@ export default {
 
 }
 </script>
+
+<style scoped>
+/* 自定义 CSS 样式规则 */
+.container {
+  margin-bottom: 20px; /* 在底部添加20像素的外边距，根据需要调整间距大小 */
+}
+</style>

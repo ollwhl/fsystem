@@ -1,14 +1,12 @@
 <template>
   <div>
-    <el-input v-model="params.keyword" :style="{ width: '50%' }" placeholder="请输入计划名称"></el-input>
-    <el-button type="warning" class="action-button" @click="search()">查询</el-button>
 
 
 
 
     <el-table
         :data="tableData"
-        height="250"
+        height="1000"
         border
         style="width: 100%"
     >
@@ -24,7 +22,13 @@
           <span :style="{ color: 'blue' }">{{ scope.row.produced }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="planDate" label="截止期限"></el-table-column>
+      <el-table-column prop="percent" label="生产进度"></el-table-column>
+
+      <el-table-column prop="planDate" label="截止期限">
+        <template slot-scope="scope">
+          <span :style="{ color: isDeadlineNear(scope.row.planDate) ? 'red' : 'green' }">{{ scope.row.planDate }}</span>
+        </template>
+      </el-table-column>
 
       <el-table-column label="操作" width="200">
 
@@ -56,7 +60,12 @@
             <el-input v-model="editRow.produced"></el-input>
           </el-form-item>
             <el-form-item label="截止日期">
-              <el-input v-model="editRow.planDate"></el-input>
+                <el-date-picker v-model="editRow.planDate"
+
+                    type="datetime"
+                    placeholder="选择日期时间">
+
+              </el-date-picker>
             </el-form-item>
 
       </el-form>
@@ -115,6 +124,8 @@ export default {
   },
   created() {//页面创建时调用的方法
     this.load()
+    setInterval(this.checkDeadlines, 600000) // 600,000 毫秒 = 10 分钟
+
   },
   methods:{
     load(){
@@ -124,6 +135,7 @@ export default {
         if(res.code==='0'){
           this.tableData=res.data.list
           this.total=res.data.total
+          this.checkDeadlines();
         }
       })
     },
@@ -150,7 +162,22 @@ export default {
       });
     },
 
+    isDeadlineNear(planDate) {
+      const currentTime = new Date().getTime();
+      const deadlineTime = new Date(planDate).getTime();
+      const oneDay = 24 * 60 * 60 * 1000; // 一天的毫秒数
 
+      // 如果截止日期距离当前时间不足一天，则返回 true，否则返回 false
+      return deadlineTime - currentTime < oneDay;
+    },
+
+    // 定时检查截止日期
+    checkDeadlines() {
+      // 遍历表格数据，更新视图
+      this.tableData.forEach((row) => {
+        row.isDeadlineNear = this.isDeadlineNear(row.planDate);
+      });
+    },
 
     cancel(row, popoverName) {
       row[`${popoverName}Visible`] = false;
@@ -176,22 +203,7 @@ export default {
       this.params.pageNum = pageNum
       this.load()
     },
-    search(){
-      request.get("plan/search",{
-        params:this.params
-      }).then(res => {
-        if (res.code === '0') {
-          this.tableData = res.data.list
-          this.total = res.data.total
-        } else {
-          this.$message({
-            message: this.res.msg,
-            type: 'error'
-          });
-        }
-        this.load()//后台更新数据后重新显示
-      })
-    },
+
   }
 
 
