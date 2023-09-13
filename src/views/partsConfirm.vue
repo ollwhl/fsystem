@@ -170,7 +170,7 @@ export default {
       const partsName = row.name;
 
       // 向后端发送请求以确认收货
-      request.post("/factory/confirmArrive", {
+      request.post("/factory/confirmParts", {
         partsName: row.name,
         quantity: unreceived,
       }).then((res) => {
@@ -230,22 +230,7 @@ export default {
       this.lossDialogVisible = false;
       this.lossQuantity = 0; // 清空损耗数量
     },
-    handleSpanMethod({ row, column, rowIndex, columnIndex }) {
-      if (columnIndex === 0) { // 如果是产品名称列
-        let rowspan = 1; // 初始化 rowspan 为 1
 
-        // 遍历当前行之前的行，检查是否有相同的产品名称
-        for (let i = rowIndex - 1; i >= 0; i--) {
-          if (this.tableData[i].productName === row.productName) {
-            rowspan++;
-          } else {
-            break; // 如果找到不同的产品名称，退出循环
-          }
-        }
-
-        return { rowspan, colspan: 1 }; // 返回 rowspan 和 colspan，以便合并单元格
-      }
-    },
     search(){
       request.get("tech/search",{
         params:this.params

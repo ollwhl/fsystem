@@ -122,7 +122,7 @@ export default {
         params: this.params
       }).then(res=> {//使用get方法请求/amdin
         if (res.code === '0'){
-          this.tableData =res.data.list//更新表格
+          this.tableData = res.data.list.filter(item => item.planNum !== 0);
           this.total =res.data.total//更新总条数
         }
       })

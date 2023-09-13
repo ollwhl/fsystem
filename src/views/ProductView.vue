@@ -23,14 +23,7 @@
       <el-table-column prop="note" label="备注"></el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
-          <el-popover placement="top" width="160" v-model="scope.row.addVisible">
-            <el-input v-model="scope.row.addInput" placeholder="请输入内容"></el-input>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="cancel(scope.row, 'add')">取消</el-button>
-              <el-button type="primary" size="mini" @click="submit(scope.row, 'add')">确定</el-button>
-            </div>
-            <el-button slot="reference">入库</el-button>
-          </el-popover>
+          <el-button type="primary" @click="confirmReceipt(scope.row)">确认收货</el-button>
           <el-popover placement="top" width="160" v-model="scope.row.redVisible">
             <el-input v-model="scope.row.redInput" placeholder="请输入内容"></el-input>
             <div style="text-align: right; margin: 0">
@@ -85,6 +78,7 @@ export default {
 
     }
   },
+
   created() {//页面创建时调用的方法
     this.load()
   },
@@ -104,11 +98,12 @@ export default {
       row.redInput = "";
       row[`${popoverName}Visible`] = false;
     },
-
+//出库操作
     submit(row, popoverName) {
       const input = popoverName === 'add' ? row.addInput : row.redInput;
 
-      request.post("parts/count", {
+      request.post("/factory/reduce ", { //
+
         confirm: popoverName === 'add' ? input : -input, // 如果是入库操作，则传入正数，如果是出库操作，则传入负数
         name: row.name, // 零件的name，用于标识要操作的零件
 
@@ -130,6 +125,32 @@ export default {
     handleCurrentChange(pageNum){
       this.params.pageNum = pageNum
       this.load()
+    },
+    // 确认收货
+    confirmReceipt(row) {
+      // 获取未收货的数量
+      const unreceived = row.unreceived;
+
+      if (unreceived <= 0) {
+        this.$message.error("没有未收货的数量可确认。");
+        return;
+      }
+
+      // 假设零件 ID 存储在 row.id 中，您需要根据您的数据结构进行修改
+      const partsName = row.name;
+
+      // 向后端发送请求以确认收货
+      request.post("/factory/confirmProduct", {
+        productName: row.name,
+
+      }).then((res) => {
+        if (res.code === '0') {
+          this.$message.success("确认收货成功。");
+          this.load(); // 更新页面数据
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
     },
     search(){
       request.get("parts/searchProduct",{
