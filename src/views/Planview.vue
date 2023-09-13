@@ -182,6 +182,10 @@ export default {
     },
     // 保存新增
     saveAdd() {
+      if (!this.addRow.planNum || !this.addRow.planDate) {
+        this.$message.error("数量和截止日期不能为空");
+        return;
+      }
       request.post("plan/editPlan", this.addRow
 
       ).then((res) => {
