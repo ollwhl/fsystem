@@ -343,11 +343,14 @@ export default {
       this.dialogData.checkPartsMessage = ""
       this.dialogData.partNameList.push('');
       this.dialogData.numList.push('');
-      this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
+      this.index++
+      console.log(this.index)
     },
     removePart(index) {
       this.dialogData.partNameList.splice(index, 1);
       this.dialogData.numList.splice(index, 1);
+      this.index--
+      this.dialogData.checkPartsMessage = "零件存在"
     },
     submitForm() {//提交产品零件
       if (!this.dialogData.productId) {
@@ -382,7 +385,8 @@ export default {
     },
 
     openPartsDialog(){
-      const partsName = this.dialogData.partNameList[this.index+1];
+      const partsName = this.dialogData.partNameList[this.index];
+      console.log(this.index)
       this.newPartsForm={}
       this.newPartsForm.name = partsName
       this.partDialogVisible = true;
@@ -476,7 +480,6 @@ export default {
     },
 
     delParts(row){
-      //console.log(6666)
       request.post("/tech/delParts", {id: row.id}).then(res=>{
 
         if(res.code==='0'){
