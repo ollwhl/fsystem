@@ -15,10 +15,10 @@
       <el-table-column prop="name" label="产品名" width="180"></el-table-column>
       <el-table-column prop="num" label="数量" width="180"></el-table-column>
       <el-table-column prop="standard" label="规格"></el-table-column>
-      <el-table-column prop="planNum"  label="计划数量">
-        <template slot-scope="scope">
-          <span :style="{ color: 'red' }">{{ scope.row.planNum }}</span>
-        </template>
+      <el-table-column prop="productConfirm"  label="待入库数量">
+<!--        <template slot-scope="scope">-->
+<!--          <span :style="{ color: 'red' }">{{ scope.row.planNum }}</span>-->
+<!--        </template>-->
       </el-table-column>
       <el-table-column prop="note" label="备注"></el-table-column>
       <el-table-column label="操作" width="200">
@@ -100,11 +100,9 @@ export default {
     },
 //出库操作
     submit(row, popoverName) {
-      const input = popoverName === 'add' ? row.addInput : row.redInput;
-
       request.post("/factory/reduce ", { //
 
-        confirm: popoverName === 'add' ? input : -input, // 如果是入库操作，则传入正数，如果是出库操作，则传入负数
+        num: row.redInput, // 如果是入库操作，则传入正数，如果是出库操作，则传入负数
         name: row.name, // 零件的name，用于标识要操作的零件
 
       }).then(res => {
@@ -141,8 +139,7 @@ export default {
 
       // 向后端发送请求以确认收货
       request.post("/factory/confirmProduct", {
-        productName: row.name,
-
+        name: row.name
       }).then((res) => {
         if (res.code === '0') {
           this.$message.success("确认收货成功。");
