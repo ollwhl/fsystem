@@ -1,8 +1,8 @@
 <template>
   <div class="notice-view">
     <div class="action-bar">
-      <el-input v-model="params.keyword" placeholder="请输入公告标题" :style="{ width: '50%' }"></el-input>
-      <el-button type="warning" class="action-button" @click="search()">查询</el-button>
+      <el-input v-model="addForm.title" placeholder="请输入公告标题" :style="{ width: '50%' }"></el-input>
+
       <el-button type="primary" class="action-button" @click="add('dialogAddForm')">新增 </el-button>
     </div>
 
@@ -34,9 +34,9 @@
     <div>
       <el-dialog title="新增公告" :visible.sync="dialogAddFormVisible">
         <el-form :model="addForm">
-          <el-form-item label="公告标题" :label-width="formLabelWidth">
-            <el-input v-model="addForm.title" autocomplete="off" clearable></el-input>
-          </el-form-item>
+
+
+
           <el-form-item label="公告内容" :label-width="formLabelWidth">
             <el-input type="textarea" v-model="addForm.msg" autocomplete="off"></el-input>
           </el-form-item>
@@ -121,22 +121,12 @@ export default {
       this.params.pageNum = pageNum
       this.load()
     },
-    search(){
-      request.get("/notice/search",{
-        params: this.params
-      }).then(res => {
-        if (res.code === '0') {
-          this.tableData = res.data.list
-          this.total =res.data.total
-        }else{
 
-        }
-      })
-    },
     add(dialogName){
       this.form = {}
       this[`${dialogName}Visible`] = true
       this.successMsg = "添加成功"
+
     },
     // 显示删除确认对话框
     showDeleteConfirm(row) {
@@ -188,6 +178,7 @@ export default {
 
       }).then(res =>{
         if(res.code === '0'){
+          this.addForm.title = "";
           this[`${dialogName}Visible`] = false
           this.$message({
             message: this.successMsg,

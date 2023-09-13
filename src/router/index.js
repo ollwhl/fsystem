@@ -50,6 +50,11 @@ const routes = [
         name: 'Factory',
         component: () => import('../views/FactoryView.vue')
       },
+      {
+        path: '/partsconfirm',
+        name: 'partsconfirm',
+        component: () => import('../views/partsConfirm')
+      },
   {
     path: '/parts',
     name: 'parts',

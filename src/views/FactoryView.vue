@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="container">
-    <el-input v-model="params.keyword" placeholder="输入产品名进行搜索合成表" :style="{ width: '25%' }"></el-input>
+    <el-input v-model="params.keyword" placeholder="输入产品名进行搜索" :style="{ width: '25%' }"></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
 
-    <el-button type="warning" class="action-button"@click="progressUpdateDialog">生产进度更新</el-button>
+
       <el-button type="primary" @click="showProgress">显示生产进度</el-button>
 
       <!-- 生产进度条 -->
@@ -26,45 +26,22 @@
       </div>
     </el-dialog>
     <el-table
-        :data="tableData"
+        :data="filteredTableData"
         height="750"
         border
         style="width: 100%"
     >
-      <el-table-column prop="productName" label="产品名称" width="180"></el-table-column>
-      <el-table-column prop="planNum" label="生产目标" width="180"></el-table-column>
-      <el-table-column prop="produced" label="已生产"></el-table-column>
-      <el-table-column
-              fixed="right"
-              label="生产进度"
-              width="100">
+      <el-table-column prop="productName" label="产品名称" :width="180"></el-table-column>
+      <el-table-column prop="planNum" label="生产目标" :width="180"></el-table-column>
+      <el-table-column prop="produced" label="已生产" :width="180"></el-table-column>
+      <el-table-column label="操作" :width="180">
         <template slot-scope="scope">
-          <el-progress :percentage="producePercent(scope.row)"></el-progress>
+          <el-button type="warning" class="action-button"@click="progressUpdateDialog(scope.row)">生产进度更新</el-button>
         </template>
       </el-table-column>
-      <el-table-column prop="partsName" label="零件名"></el-table-column>
-      <el-table-column prop="usedParts" label="已使用"></el-table-column>
-      <el-table-column prop="partsNum"  label="零件库存"></el-table-column>
-      <el-table-column prop="confirm" label="未收货"></el-table-column>
-
-
-      <el-table-column label="操作" width="200">
+      <el-table-column fixed="right" label="生产进度" :width="180">
         <template slot-scope="scope">
-
-          <div class="button-container">
-            <el-button type="primary" @click="confirmReceipt(scope.row)">确认收货</el-button>
-            <el-button type="danger" @click="showLossDialog(scope.row)">确认损耗</el-button>
-          </div>
-
-          <!-- 损耗确认弹窗 -->
-          <el-dialog :visible.sync="lossDialogVisible" title="确认损耗" :center="true"  :width="'50%'">
-            <span>损耗零件：</span>
-            <el-input v-model.number="lossQuantity" placeholder="输入损耗数量" :style="{ width: '25%' }"></el-input>
-            <div slot="footer">
-              <el-button @click="cancelLoss">取消</el-button>
-              <el-button type="primary" @click="confirmLoss">确认</el-button>
-            </div>
-          </el-dialog>
+          <el-progress :percentage="producePercent(scope.row)"></el-progress>
         </template>
       </el-table-column>
     </el-table>
@@ -92,6 +69,22 @@
 import request from "@/utils/request";
 export default {
   name:"PartsView",
+  computed: {
+    filteredTableData() {
+      const filteredData = [];
+      const seenProductNames = new Set();
+
+      // 遍历原始的 tableData
+      this.tableData.forEach((row) => {
+        if (!seenProductNames.has(row.productName)) {
+          seenProductNames.add(row.productName);
+          filteredData.push(row);
+        }
+      });
+
+      return filteredData;
+    },
+  },
   data(){
     return {
 
@@ -153,10 +146,10 @@ export default {
 
 
    //progress update
-    progressUpdateDialog() {
-      this.progressUpdateForm.productName = ''; // 清空输入框
-      this.progressUpdateForm.produced = 0; // 清空输入框
-      this.progressUpdateVisible = true; // 打开弹窗
+    progressUpdateDialog(row) {
+      this.progressUpdateForm.productName = row.productName; // 将产品名称设置为对话框表单字段
+      this.progressUpdateForm.produced = 0; // 清空已生产数量
+      this.progressUpdateVisible = true; // 打开对话框
     },
     cancelProgressUpdate() {
       this.progressUpdateVisible = false; // 取消弹窗
@@ -186,80 +179,12 @@ export default {
 
 
 
-    // 确认收货
-    confirmReceipt(row) {
-      // 获取未收货的数量
-      const unreceived = row.unreceived;
-
-      if (unreceived <= 0) {
-        this.$message.error("没有未收货的数量可确认。");
-        return;
-      }
-
-      // 假设零件 ID 存储在 row.id 中，您需要根据您的数据结构进行修改
-      const partsName = row.name;
-
-      // 向后端发送请求以确认收货
-      request.post("/factory/confirmArrive", {
-        partsName: row.name,
-        quantity: unreceived,
-      }).then((res) => {
-        if (res.code === '0') {
-          this.$message.success("确认收货成功。");
-          this.load(); // 更新页面数据
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
-    },
 
 
 
-    // 打开损耗确认弹窗
-    showLossDialog(row) {
-      this.lossDialogVisible = true;
-      // 初始化损耗数量为零
-      this.lossQuantity = 0;
-      // 将当前行的数据传递到弹窗中，以便在确认损耗时使用
-      this.currentRow = row;
-    },
 
-    // 取消损耗确认
-    cancelLoss() {
-      this.lossDialogVisible = false;
-      this.lossQuantity = 0; // 清空损耗数量
-    },
-    // 提交损耗确认
-    confirmLoss() {
-      // 获取损耗数量
-      const lossQuantity = this.lossQuantity;
 
-      // 如果损耗数量小于等于零，显示错误消息并返回
-      if (lossQuantity <= 0) {
-        this.$message.error("请输入有效的损耗数量。");
-        return;
-      }
 
-      // 获取当前行的数据，假设零件 ID 存储在 currentRow.id 中
-      const partsName = this.currentRow.partsName;
-
-      // 向后端发送请求以确认损耗
-      request.post("factory/editLost", {
-        name: partsName,
-        lost: lossQuantity,
-      }).then((res) => {
-        if (res.code === '0') {
-          this.$message.success("确认损耗成功。");
-          this.load(); // 更新页面数据
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
-
-      // 关闭损耗确认弹窗
-      this.lossDialogVisible = false;
-      this.lossQuantity = 0; // 清空损耗数量
-    },
 
 // 显示生产进度条
     showProgress() {

@@ -78,8 +78,8 @@
               <span>生产车间</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="/factory">确认项目</el-menu-item>
-
+              <el-menu-item index="/factory">生产进度确认</el-menu-item>
+              <el-menu-item index="/partsconfirm">零件确认</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
 
@@ -119,12 +119,15 @@
       },
       updateCurrentTime() {
         const now = new Date(); // 获取当前时间
+        const year = now.getFullYear().toString().padStart(4, "0"); // 年
+        const month = (now.getMonth() + 1).toString().padStart(2, "0"); // 月
+        const day = now.getDate().toString().padStart(2, "0"); // 日
         const hours = now.getHours().toString().padStart(2, "0"); // 时
         const minutes = now.getMinutes().toString().padStart(2, "0"); // 分
         const seconds = now.getSeconds().toString().padStart(2, "0"); // 秒
 
         // 将时间拼接成字符串格式 HH:MM:SS
-        this.currentTime = `${hours}:${minutes}:${seconds}`;
+        this.currentTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
       },
     },
   };
