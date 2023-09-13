@@ -38,8 +38,14 @@
             <el-input v-model="addForm.name" autocomplete="off" clearable></el-input>
           </el-form-item>
           <el-form-item label="人员权限" :label-width="formLabelWidth">
-            <el-select v-model="addForm.group" placeholder="管理员">
-              <el-option label="管理员" value="1"></el-option>
+            <el-select v-model="addForm.group" placeholder="请选择权限">
+              <el-option label="管理员" value="管理员"></el-option>
+              <el-option label="零件仓库" value="零件仓库"></el-option>
+              <el-option label="半成品仓库" value="半成品仓库"></el-option>
+              <el-option label="总成仓库" value="总成仓库"></el-option>
+              <el-option label="计划部" value="计划部"></el-option>
+              <el-option label="科技部" value="科技部"></el-option>
+              <el-option label="生产部" value="生产部"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="密码" :label-width="formLabelWidth">
@@ -104,7 +110,7 @@
           group: "",
           phone: "",
           note: "",
-          password: "123456",
+          password: "",
         },
         successMsg:"",
         dialogAddFormVisible: false,
@@ -142,12 +148,11 @@
             this.tableData = res.data.list//从返回的数据更新到当前页面
             this.total =res.data.total//更新所有返回数据的总条数
           }else{
-
           }
         })
       },
       add(dialogName){
-        this.form = {}
+        this.addForm = {}
         this[`${dialogName}Visible`] = true
         this.successMsg = "添加成功"
       },//多个表格调用同一个方法更改数据${}连接字符串

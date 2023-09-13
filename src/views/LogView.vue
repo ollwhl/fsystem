@@ -92,7 +92,7 @@ export default {
       this.load()
     },
     search(){
-      request.get("log/search",{
+      request.get("log/searchLog",{
         params: this.params
       }).then(res => {
         if (res.code === '0') {

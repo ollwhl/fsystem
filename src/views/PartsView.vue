@@ -155,8 +155,17 @@ export default {
 
     submit(row, popoverName) {
       const input = popoverName === 'add' ? row.addInput : row.redInput;
+      if (input < 1){
+        this.$message.error("请输入正整数");
+        return
+      }
+      if (popoverName === "red" && input>row.num){
+        this.$message.error("出库超出库存数");
+        return
+      }
 
       request.post("parts/count", {
+
         confirm: popoverName === 'add' ? input : -input, // 如果是入库操作，则传入正数，如果是出库操作，则传入负数
         name: row.name, // 零件的name，用于标识要操作的零件
 
