@@ -39,12 +39,11 @@
                 <el-input v-model="dialogData.numList[index]" @input="handleInputForAddedNum(index)" :placeholder="'零件数量'" />
                 <el-button @click="removePart(index)" icon="el-icon-close"></el-button>
               </div>
-              <span>{{dialogData.checkPartsMessage}}</span>
-              <template v-if="dialogData.checkPartsMessage === '零件不存在'">
-                <el-button type="primary" class="action-button" @click="openPartsDialog(index)">新增零件</el-button>
-              </template>
             </div>
-
+            <span>{{dialogData.checkPartsMessage}}</span>
+            <template v-if="dialogData.checkPartsMessage === '仓库中不存在该零件，请先向仓库添加该零件'">
+              <el-button type="primary" class="action-button" @click="openPartsDialog()">向仓库添加新零件</el-button>
+            </template>
           </div>
           <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="addInputBox" :disabled="isDisabled">添加零件</el-button>
@@ -92,7 +91,7 @@
               </div>
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <span style="margin-right: 12px;">零件类型：</span>
-                <el-select v-model="newPartsForm.group" placeholder="零件" style="width: 48%;">
+                <el-select v-model="newPartsForm.group" placeholder="请选择仓库类型" style="width: 48%;">
                   <el-option label="零件" value="零件仓库"></el-option>
                   <el-option label="半成品" value="半成品仓库"></el-option>
                 </el-select>
@@ -182,13 +181,15 @@ export default {
       margeArray: [],
       tableData: [],
 
-
       params: {
         keyword: "",
         pageSize: "10",
         pageNum: "1",
 
       },
+
+
+      index:0,
       addProductDialogVisible: false,
       newProductForm: {
         productName: "",
@@ -236,9 +237,9 @@ export default {
     this.load()
   },
   computed: {
-    // isDisabled() {
-    //   return this.dialogData.checkPartsMessage === "零件不存在"
-    // }
+    isDisabled() {
+      return this.dialogData.checkPartsMessage === "仓库中不存在该零件，请先向仓库添加该零件"|| this.dialogData.checkPartsMessage === ""
+    }
   },
   methods: {
     // +-----------------------------------+
@@ -296,6 +297,7 @@ export default {
     },
 
     openDialog() {
+      this.index=0;
       this.dialogData = {
         dialogVisible: false,
         productName: '',
@@ -330,7 +332,7 @@ export default {
               this.dialogData.checkPartsMessage = "零件存在"
               console.log("ok")
             } else {
-              this.dialogData.checkPartsMessage = "零件不存在"
+              this.dialogData.checkPartsMessage = "仓库中不存在该零件，请先向仓库添加该零件"
               console.log(" no ok")
             }
           });
@@ -338,6 +340,7 @@ export default {
     handleInputForAddedNum(index) {
     },
     addInputBox() {
+      this.dialogData.checkPartsMessage = ""
       this.dialogData.partNameList.push('');
       this.dialogData.numList.push('');
       this.timeoutIds.push(null); // 新增输入框时，添加一个新的计时器ID
@@ -378,17 +381,20 @@ export default {
       this.timeoutIds = []; // 关闭弹窗时清除计时器ID
     },
 
-    openPartsDialog(index){
-      const partsName = this.dialogData.partNameList[index];
+    openPartsDialog(){
+      const partsName = this.dialogData.partNameList[this.index+1];
       this.newPartsForm={}
       this.newPartsForm.name = partsName
-      this.newPartsForm.group = "零件仓库"
       this.partDialogVisible = true;
     },
     submitAddPartsForm() {//提交表单调用该方法
       if (!this.newPartsForm.id) {
         this.$message.error('零件编号不能为空');
         return; // 如果零件编号为空，不执行后续操作
+      }
+      if (!this.newPartsForm.group) {
+        this.$message.error('仓库不能为空');
+        return;
       }
 
 

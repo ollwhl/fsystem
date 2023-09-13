@@ -220,7 +220,7 @@ export default {
       this.load()
     },
     search(){
-      request.get("plan/search",{
+      request.get("parts/searchProduct",{
         params:this.params
       }).then(res => {
         if (res.code === '0') {
@@ -232,7 +232,6 @@ export default {
             type: 'error'
           });
         }
-        this.load()//后台更新数据后重新显示
       })
     },
   }

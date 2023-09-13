@@ -204,7 +204,7 @@ export default {
 
 
     search(){
-      request.get("parts/search",{
+      request.get("parts/searchParts",{
         params:this.params
       }).then(res => {
         if (res.code === '0') {
@@ -217,7 +217,6 @@ export default {
             type: 'error'
           });
         }
-        this.load()//后台更新数据后重新显示
       })
     },
   }

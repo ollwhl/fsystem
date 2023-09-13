@@ -34,6 +34,14 @@
       <el-table-column prop="productName" label="产品名称" width="180"></el-table-column>
       <el-table-column prop="planNum" label="生产目标" width="180"></el-table-column>
       <el-table-column prop="produced" label="已生产"></el-table-column>
+      <el-table-column
+              fixed="right"
+              label="生产进度"
+              width="100">
+        <template slot-scope="scope">
+          <el-progress :percentage="producePercent(scope.row)"></el-progress>
+        </template>
+      </el-table-column>
       <el-table-column prop="partsName" label="零件名"></el-table-column>
       <el-table-column prop="usedParts" label="已使用"></el-table-column>
       <el-table-column prop="partsNum"  label="零件库存"></el-table-column>
@@ -268,7 +276,18 @@ export default {
       }, 1000); // 更新频率，可以根据需要调整
     },
 
+    producePercent(row){
 
+      // let percent = row.planNum/row.produced*100
+      // let planNum =row.planNum
+      // let produced = row.produced
+      //
+      // console.log("percent"+percent)
+      // console.log(planNum)
+      // console.log(produced)
+      // console.log(row)
+      return row.produced/row.planNum*100
+    },
 
 
     search(){
