@@ -420,7 +420,7 @@ export default {
           this.partDialogVisible = false
           this.dialogData.checkPartsMessage = "零件存在"
           this.$message({
-            message: this.successMsg,
+            message: '零件添加成功',
             type: 'success'
           });
         } else {
