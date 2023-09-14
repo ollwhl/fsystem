@@ -179,6 +179,11 @@ export default {
 
     submitAddForm(dialogName){
       console.log(this.addForm.title)
+      if (!this.addForm.title) {
+        this.$message.error('公告标题不能为空');
+        return; // 阻止表单提交
+      }
+
       request.post("notice/addNotice",{
         title: this.addForm.title,
         msg: this.addForm.msg,
