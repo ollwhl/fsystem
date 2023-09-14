@@ -164,11 +164,13 @@
         this[`${dialogName}Visible`] = true
         this.successMsg = "添加成功"
       },//多个表格调用同一个方法更改数据${}连接字符串
+
       edit(obj){
         this.addForm = obj
         this.dialogAddFormVisible=true
         this.successMsg = "修改成功"
       },
+       //编辑
       submitAddForm(dialogName){//提交表单调用该方法
         request.post("user/add",{
           name: this.addForm.name,
@@ -193,6 +195,7 @@
           this.load()
         })
       },
+
       showProgress() {
         return new Promise((resolve) => {
           this.showProgressbar = true; // 设置为显示生产进度条

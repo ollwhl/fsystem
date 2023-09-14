@@ -32,12 +32,17 @@
       <el-table-column prop="productName" label="产品名称" :width="250"></el-table-column>
       <el-table-column prop="planNum" label="生产目标" :width="250"></el-table-column>
       <el-table-column prop="produced" label="已生产" :width="250"></el-table-column>
+      <el-table-column prop="lost" label=损耗></el-table-column>
       <el-table-column label="操作" :width="250">
         <template slot-scope="scope">
-          <el-button type="warning" class="action-button"@click="progressUpdateDialog(scope.row)">生产进度更新</el-button>
+          <el-button type="warning" class="action-button"@click="progressUpdateDialog(scope.row)">进度更新</el-button>
+          <el-button type="danger" @click="showLossDialog(scope.row)" style="margin-left: 10px;">确认损耗</el-button>
         </template>
 
       </el-table-column>
+
+
+
       <el-table-column prop="planDate" label="截止日期" :width="250"></el-table-column>
       <el-table-column label="生产进度" :width="250">
         <template slot-scope="scope">
@@ -46,7 +51,15 @@
       </el-table-column>
     </el-table>
 
-
+    <!-- 损耗确认弹窗 -->
+    <el-dialog :visible.sync="lossDialogVisible" title="确认损耗" :center="true"  :width="'50%'">
+      <span>损耗零件：</span>
+      <el-input v-model.number="lossQuantity" placeholder="输入损耗数量" :style="{ width: '25%' }"></el-input>
+      <div slot="footer">
+        <el-button @click="cancelLoss">取消</el-button>
+        <el-button type="primary" @click="confirmLoss">确认</el-button>
+      </div>
+    </el-dialog>
 
     <div class="block">
       <span class="demonstration"></span>
@@ -181,6 +194,53 @@ export default {
 
 
 
+
+    // 打开损耗确认弹窗
+    showLossDialog(row) {
+      this.lossDialogVisible = true;
+      // 初始化损耗数量为零
+      this.lossQuantity = 0;
+      // 将当前行的数据传递到弹窗中，以便在确认损耗时使用
+      this.currentRow = row;
+    },
+
+    // 取消损耗确认
+
+    cancelLoss() {
+      this.lossDialogVisible = false;
+      this.lossQuantity = 0; // 清空损耗数量
+    },
+    // 提交损耗确认
+    confirmLoss() {
+      // 获取损耗数量
+      const lossQuantity = this.lossQuantity;
+
+      // 如果损耗数量小于等于零，显示错误消息并返回
+      if (lossQuantity <= 0) {
+        this.$message.error("请输入有效的损耗数量。");
+        return;
+      }
+
+      // 获取当前行的数据，假设零件 ID 存储在 currentRow.id 中
+      const partsName = this.currentRow.partsName;
+
+      // 向后端发送请求以确认损耗
+      request.post("factory/editLost", {
+        name: partsName,
+        lost: lossQuantity,
+      }).then((res) => {
+        if (res.code === '0') {
+          this.$message.success("确认损耗成功。");
+          this.load(); // 更新页面数据
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+
+      // 关闭损耗确认弹窗
+      this.lossDialogVisible = false;
+      this.lossQuantity = 0; // 清空损耗数量
+    },
 
 
 
