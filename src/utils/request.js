@@ -10,11 +10,7 @@ request.interceptors.request.use(config => {
     if(user){
         config.headers['token'] = JSON.parse(user).token
     }
-    // if (config.method === 'get') {
-    //     if (user) {
-    //         config.params['token'] = JSON.parse(user).token;
-    //     }
-    // }
+
     return config;
 },error => {
     return Promise.reject(error)

@@ -58,6 +58,7 @@
             <el-menu-item-group>
               <el-menu-item index="/newplan"  v-if="user.group === '计划部'|| user.group === '管理员'">新增计划管理</el-menu-item>
               <el-menu-item index="/oldplan">现有计划管理</el-menu-item>
+              <el-menu-item index="/loss"  v-if="user.group === '计划部'|| user.group === '管理员'">损耗管理</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
 

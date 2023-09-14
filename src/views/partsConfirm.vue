@@ -3,8 +3,9 @@
     <div class="container">
       <el-input v-model="params.keyword" placeholder="输入产品名进行搜索合成表" :style="{ width: '25%' }"></el-input>
       <el-button type="warning" class="action-button" @click="search()">查询</el-button>
-      <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
     </div>
+    <!-- 生产进度条 -->
+    <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
 
     <el-table
         :data="tableData"
@@ -15,9 +16,9 @@
     >
       <el-table-column prop="productName" label="产品名称" width="180"></el-table-column>
       <el-table-column prop="partsName" label="零件名"></el-table-column>
-      <el-table-column prop="usedParts" label="已使用"></el-table-column>
       <el-table-column prop="partsNum"  label="零件库存"></el-table-column>
-      <el-table-column prop="confirm" label="未收货"></el-table-column>
+      <el-table-column prop="lost" label=损耗></el-table-column>
+      <el-table-column prop="partsConfirm" label="未收货"></el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
 
@@ -99,8 +100,10 @@ export default {
         params: this.params
       }).then(res=> {//使用get方法请求/amdin
         if (res.code === '0'){
-          this.tableData =res.data.list//更新表格
-          this.total =res.data.total//更新总条数
+          this.showProgress().then(()=> {
+            this.tableData = res.data.list
+            this.total =res.data.total//更新总条数
+          })
         }
       })
     },
@@ -171,8 +174,7 @@ export default {
 
       // 向后端发送请求以确认收货
       request.post("/factory/confirmParts", {
-        partsName: row.name,
-        quantity: unreceived,
+        name: row.partsName,
       }).then((res) => {
         if (res.code === '0') {
           this.$message.success("确认收货成功。");
@@ -246,6 +248,23 @@ export default {
         }
         this.load()//后台更新数据后重新显示
       })
+    },
+    showProgress() {
+      return new Promise((resolve) => {
+        this.showProgressbar = true; // 设置为显示生产进度条
+        this.progressPercentage = 0; // 重置进度为0
+
+        // 模拟生产进度更新，实际中需要根据您的业务逻辑来更新进度
+        const interval = setInterval(() => {
+          if (this.progressPercentage < 100) {
+            this.progressPercentage += 10; // 每次增加10%
+          } else {
+            clearInterval(interval); // 达到100%后停止更新
+            this.showProgressbar = false;
+            resolve(); // 进度条完成后调用resolve
+          }
+        }, 120); // 更新频率，可以根据需要调整
+      });
     },
   }
 

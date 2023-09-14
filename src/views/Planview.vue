@@ -5,6 +5,9 @@
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
 　　　</div>
 
+      <!-- 生产进度条 -->
+      <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
+
     <!-- 新增弹窗 -->
     <el-dialog :visible.sync="addVisible" title="新增计划">
       <el-form :model="addRow" ref="addForm" label-width="100px">
@@ -17,7 +20,7 @@
         </el-form-item>
         <el-form-item label="截止日期">
           <!-- Use el-date-picker for selecting a date -->
-          <el-date-picker v-model="addRow.planDate" type="date" placeholder="选择日期"></el-date-picker>
+          <el-date-picker v-model="addRow.planDate" placeholder="选择日期" value-format="yyyy-MM-dd"></el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -113,6 +116,9 @@ export default {
       editRow: {},
       addRow: {},
 
+        showProgressbar: false, // 是否显示生产进度条
+        progressPercentage: 0, // 生产进度百分比
+
     }
   },
   created() {//页面创建时调用的方法
@@ -133,12 +139,14 @@ export default {
         // 然后请求获取计划数据
         request.get("parts/getProduct", {
           params: this.params
-        }).then(planRes => {
-          if (planRes.code === '0') {
-            this.tableData = planRes.data.list;
-            this.total = planRes.data.total;
-          } else {
-            this.$message.error(planRes.msg);
+        }).then(res => {
+            if (res.code === '0'){
+                this.showProgress().then(()=> {
+                    this.tableData = res.data.list
+                    this.total =res.data.total//更新总条数
+                })
+            } else {
+            this.$message.error(res.msg);
           }
         });
       // });
@@ -238,6 +246,23 @@ export default {
         }
       })
     },
+      showProgress() {
+          return new Promise((resolve) => {
+              this.showProgressbar = true; // 设置为显示生产进度条
+              this.progressPercentage = 0; // 重置进度为0
+
+              // 模拟生产进度更新，实际中需要根据您的业务逻辑来更新进度
+              const interval = setInterval(() => {
+                  if (this.progressPercentage < 100) {
+                      this.progressPercentage += 10; // 每次增加10%
+                  } else {
+                      clearInterval(interval); // 达到100%后停止更新
+                      this.showProgressbar = false;
+                      resolve(); // 进度条完成后调用resolve
+                  }
+              }, 120); // 更新频率，可以根据需要调整
+          });
+      },
   }
 
 
