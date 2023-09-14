@@ -29,16 +29,17 @@
         border
         style="width: 100%"
     >
-      <el-table-column prop="productName" label="产品名称" :width="180"></el-table-column>
-      <el-table-column prop="planNum" label="生产目标" :width="180"></el-table-column>
-      <el-table-column prop="produced" label="已生产" :width="180"></el-table-column>
-      <el-table-column label="操作" :width="180">
+      <el-table-column prop="productName" label="产品名称" :width="250"></el-table-column>
+      <el-table-column prop="planNum" label="生产目标" :width="250"></el-table-column>
+      <el-table-column prop="produced" label="已生产" :width="250"></el-table-column>
+      <el-table-column label="操作" :width="250">
         <template slot-scope="scope">
           <el-button type="warning" class="action-button"@click="progressUpdateDialog(scope.row)">生产进度更新</el-button>
         </template>
-        <el-table-column prop="planDate" label="截止日期" :width="180"></el-table-column>
+
       </el-table-column>
-      <el-table-column label="生产进度" :width="180">
+      <el-table-column prop="planDate" label="截止日期" :width="250"></el-table-column>
+      <el-table-column label="生产进度" :width="250">
         <template slot-scope="scope">
           <el-progress :percentage="producePercent(scope.row)"></el-progress>
         </template>
