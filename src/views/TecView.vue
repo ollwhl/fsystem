@@ -11,6 +11,9 @@
     <el-button type="primary" class="action-button" @click="openDialog">新增产品</el-button>
     <!--    <el-button type="primary" class="action-button" @click="openPartsDialog">新增零件</el-button>-->
 
+    <!-- 生产进度条 -->
+    <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
+
     <template>
       <div>
 
@@ -231,6 +234,8 @@ export default {
       successMsg: "",
       formLabelWidth: '120px',
 
+      showProgressbar: false, // 是否显示生产进度条
+      progressPercentage: 0, // 生产进度百分比
     }
   },
   created() {//页面创建时调用的方法
@@ -252,20 +257,22 @@ export default {
       request.get("tech", {//get获取
         params: this.params
       }).then(res => {//使用get方法请求/amdin
-        if (res.code === '0') {
-          this.tableData = res.data.list
-          //开始 调用方法计算需要合并的数据
-          for (let i = 0; i < Object.keys(this.tableData[0]).length; i++) {
-            // 首先添加一个存放合并行数据的变量
-            this.margeArray.push({Arr: [], Position: 0,})
-            // 得到下标对应的key值
-            const element = Object.keys(this.tableData[0])[i];
-            // 调用合并，
-            this.rowspan(this.tableData, this.margeArray[i].Arr, this.margeArray[i].Position, element);
-            this.total = res.data.total//更新总条数
-          }
+        if (res.code === '0'){
+          this.showProgress().then(()=> {
+            this.tableData = res.data.list
+            //开始 调用方法计算需要合并的数据
+            for (let i = 0; i < Object.keys(this.tableData[0]).length; i++) {
+              // 首先添加一个存放合并行数据的变量
+              this.margeArray.push({Arr: [], Position: 0,})
+              // 得到下标对应的key值
+              const element = Object.keys(this.tableData[0])[i];
+              // 调用合并，
+              this.rowspan(this.tableData, this.margeArray[i].Arr, this.margeArray[i].Position, element);
+              this.total = res.data.total//更新总条数
+            }
+          })
         }
-      })
+       })
     },
     handleSizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -543,6 +550,23 @@ export default {
           };
         }
       }
+    },
+    showProgress() {
+      return new Promise((resolve) => {
+        this.showProgressbar = true; // 设置为显示生产进度条
+        this.progressPercentage = 0; // 重置进度为0
+
+        // 模拟生产进度更新，实际中需要根据您的业务逻辑来更新进度
+        const interval = setInterval(() => {
+          if (this.progressPercentage < 100) {
+            this.progressPercentage += 10; // 每次增加10%
+          } else {
+            clearInterval(interval); // 达到100%后停止更新
+            this.showProgressbar = false;
+            resolve(); // 进度条完成后调用resolve
+          }
+        }, 120); // 更新频率，可以根据需要调整
+      });
     },
   }
 }

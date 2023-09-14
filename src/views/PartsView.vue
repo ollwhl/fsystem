@@ -5,6 +5,9 @@
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
     <el-button type="action" class="action-button" @click="openStockOrderDialog">备货单生成</el-button>
 
+      <!-- 生产进度条 -->
+      <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
+
     </div>
     <el-dialog
         :visible.sync="stockOrderVisible"
@@ -120,7 +123,10 @@ export default {
       redInput:"",
       tableData: [],
       confirmNum:"", //交付确认
-      user:localStorage.getItem("user")?JSON.parse(localStorage.getItem("user")):{}
+      user:localStorage.getItem("user")?JSON.parse(localStorage.getItem("user")):{},
+
+      showProgressbar: false, // 是否显示生产进度条
+      progressPercentage: 0, // 生产进度百分比
 
     }
   },
@@ -141,9 +147,11 @@ export default {
       request.get(url,{
         params:this.params
       }).then(res=>{
-        if(res.code==='0'){
-          this.tableData=res.data.list
-          this.total=res.data.total
+        if (res.code === '0'){
+          this.showProgress().then(()=> {
+            this.tableData = res.data.list
+            this.total =res.data.total//更新总条数
+          })
         }
       })
       },
@@ -227,6 +235,23 @@ export default {
           });
         }
       })
+    },
+    showProgress() {
+      return new Promise((resolve) => {
+        this.showProgressbar = true; // 设置为显示生产进度条
+        this.progressPercentage = 0; // 重置进度为0
+
+        // 模拟生产进度更新，实际中需要根据您的业务逻辑来更新进度
+        const interval = setInterval(() => {
+          if (this.progressPercentage < 100) {
+            this.progressPercentage += 10; // 每次增加10%
+          } else {
+            clearInterval(interval); // 达到100%后停止更新
+            this.showProgressbar = false;
+            resolve(); // 进度条完成后调用resolve
+          }
+        }, 120); // 更新频率，可以根据需要调整
+      });
     },
   }
 

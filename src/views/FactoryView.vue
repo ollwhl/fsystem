@@ -3,12 +3,10 @@
     <div class="container">
     <el-input v-model="params.keyword" placeholder="输入产品名进行搜索" :style="{ width: '25%' }"></el-input>
     <el-button type="warning" class="action-button" @click="search()">查询</el-button>
-
-
-      <el-button type="primary" @click="showProgress">显示生产进度</el-button>
-
       <!-- 生产进度条 -->
       <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
+
+
     </div>
       <el-dialog :visible.sync="progressUpdateVisible" title="生产进度更新" :width="'50%'" >
       <el-form :model="progressUpdateForm" ref="progressUpdateForm" label-width="100px" >
@@ -122,8 +120,10 @@ export default {
         params: this.params
       }).then(res=> {//使用get方法请求/amdin
         if (res.code === '0'){
-          this.tableData = res.data.list.filter(item => item.planNum !== 0);
-          this.total =res.data.total//更新总条数
+          this.showProgress().then(()=> {
+            this.tableData = res.data.list
+            this.total =res.data.total//更新总条数
+          })
         }
       })
     },
@@ -187,7 +187,8 @@ export default {
 
 
 // 显示生产进度条
-    showProgress() {
+   showProgress() {
+    return new Promise((resolve) => {
       this.showProgressbar = true; // 设置为显示生产进度条
       this.progressPercentage = 0; // 重置进度为0
 
@@ -197,9 +198,12 @@ export default {
           this.progressPercentage += 10; // 每次增加10%
         } else {
           clearInterval(interval); // 达到100%后停止更新
+          this.showProgressbar = false;
+          resolve(); // 进度条完成后调用resolve
         }
-      }, 1000); // 更新频率，可以根据需要调整
-    },
+      }, 120); // 更新频率，可以根据需要调整
+    });
+  },
 
     producePercent(row){
 
@@ -231,6 +235,7 @@ export default {
         this.load()//后台更新数据后重新显示
       })
     },
+
   }
 
 
