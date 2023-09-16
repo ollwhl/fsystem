@@ -55,6 +55,11 @@ const routes = [
         name: 'partsconfirm',
         component: () => import('../views/partsConfirm')
       },
+        {
+            path: '/lostconfirm',
+            name: 'lostconfirm',
+            component: () => import('../views/lostConfirm')
+        },
   {
     path: '/parts',
     name: 'parts',

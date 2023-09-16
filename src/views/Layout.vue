@@ -81,6 +81,7 @@
             <el-menu-item-group>
               <el-menu-item index="/factory">生产进度确认</el-menu-item>
               <el-menu-item index="/partsconfirm">零件确认</el-menu-item>
+              <el-menu-item index="/lostconfirm">损耗确认</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
 

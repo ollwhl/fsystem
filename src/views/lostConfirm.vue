@@ -1,29 +1,29 @@
 <template>
   <div>
     <div class="container">
-      <el-input v-model="params.keyword" placeholder="输入产品名进行搜索" :style="{ width: '25%' }"></el-input>
+      <el-input v-model="params.keyword" placeholder="输入产品名进行搜索合成表" :style="{ width: '25%' }"></el-input>
       <el-button type="warning" class="action-button" @click="search()">查询</el-button>
     </div>
     <!-- 生产进度条 -->
     <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
 
     <el-table
-        :data="absoluteUnreceived"
+        :data="tableData"
         height="750"
         border
         style="width: 100%"
         :span-method="handleSpanMethod"
     >
+      <el-table-column prop="productName" label="产品名称" width="180"></el-table-column>
+      <el-table-column prop="partsName" label="零件名"></el-table-column>
+      <el-table-column prop="partsNum"  label="零件库存"></el-table-column>
+      <el-table-column prop="lost" label=损耗></el-table-column>
 
-      <el-table-column prop="name" label="零件名"></el-table-column>
-      <el-table-column prop="num"  label="零件库存"></el-table-column>
-
-      <el-table-column prop="confirm" label="未收货"></el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
 
           <div class="button-container">
-            <el-button type="primary" @click="confirmReceipt(scope.row)">确认收货</el-button>
+            <el-button type="danger" @click="showLossDialog(scope.row)" style="margin-left: 10px;">确认损耗</el-button>
 
           </div>
 
@@ -32,6 +32,15 @@
       </el-table-column>
     </el-table>
 
+    <!-- 损耗确认弹窗 -->
+    <el-dialog :visible.sync="lossDialogVisible" title="确认损耗" :center="true"  :width="'50%'">
+      <span>损耗零件：</span>
+      <el-input v-model.number="lossQuantity" placeholder="输入损耗数量" :style="{ width: '25%' }"></el-input>
+      <div slot="footer">
+        <el-button @click="cancelLoss">取消</el-button>
+        <el-button type="primary" @click="confirmLoss">确认</el-button>
+      </div>
+    </el-dialog>
 
 
     <div class="block">
@@ -54,17 +63,7 @@
 <script>
 import request from "@/utils/request";
 export default {
-
   name:"PartsView",
-  computed: {
-    absoluteUnreceived() {
-      // 使用 map 方法创建一个新数组，其中包含 'confirm' 属性的绝对值
-      return this.tableData.map(row => ({
-        ...row,
-        confirm: Math.abs(row.confirm)
-      }));
-    }
-  },
   data(){
     return {
 
@@ -98,7 +97,7 @@ export default {
   },
   methods:{
     load(){
-      request.get("factory",{//get获取
+      request.get("tech/getProductWithPlan",{//get获取
         params: this.params
       }).then(res=> {//使用get方法请求/amdin
         if (res.code === '0'){
@@ -136,56 +135,57 @@ export default {
     cancelProgressUpdate() {
       this.progressUpdateVisible = false; // 取消弹窗
     },
-    submitProgressUpdate() {
-      const productName = this.progressUpdateForm.productName;
-      const produced = this.progressUpdateForm.produced;
 
-      // 检查是否有有效的产品名称和已生产数量
-      if (!productName || !produced) {
-        this.$message.error("请输入有效的产品名称和已生产数量");
-        return;
-      }
-      request.post("factory/dailyCheck", {
-        name: productName,
-        produced: produced,
-      }).then(res => {
-        if (res.code === '0') {
-          this.$message.success("更新成功"); // 在操作成功时显示成功消息
-          this.progressUpdateVisible = false; // 关闭弹窗
-          this.load(); // 更新页面数据
-        } else {
-          this.$message.error(res.msg); // 在操作失败时显示错误消息，错误消息的内容从响应中获取
-        }
-      });
+
+// 打开损耗确认弹窗
+    showLossDialog(row) {
+      this.lossDialogVisible = true;
+      // 初始化损耗数量为零
+      this.lossQuantity = 0;
+      // 将当前行的数据传递到弹窗中，以便在确认损耗时使用
+      this.currentRow = row;
     },
 
+    // 取消损耗确认
 
+    cancelLoss() {
+      this.lossDialogVisible = false;
+      this.lossQuantity = 0; // 清空损耗数量
+    },
+    // 提交损耗确认
+    confirmLoss() {
+      // 获取损耗数量
+      const lossQuantity = this.lossQuantity;
 
-    // 确认收货
-    confirmReceipt(row) {
-      // 获取未收货的数量
-      const unreceived = row.unreceived;
-
-      if (unreceived <= 0) {
-        this.$message.error("没有未收货的数量可确认。");
+      // 如果损耗数量小于等于零，显示错误消息并返回
+      if (lossQuantity <= 0) {
+        this.$message.error("请输入有效的损耗数量。");
         return;
       }
 
-      // 假设零件 ID 存储在 row.id 中，您需要根据您的数据结构进行修改
-      const partsName = row.name;
+      // 获取当前行的数据，假设零件 ID 存储在 currentRow.id 中
+      const partsName = this.currentRow.partsName;
 
-      // 向后端发送请求以确认收货
-      request.post("/factory/confirmParts", {
-        name: row.name,
+      // 向后端发送请求以确认损耗
+      request.post("factory/editLost", {
+        name: partsName,
+        lost: lossQuantity,
       }).then((res) => {
         if (res.code === '0') {
-          this.$message.success("确认收货成功。");
+          this.$message.success("确认损耗成功。");
           this.load(); // 更新页面数据
         } else {
           this.$message.error(res.msg);
         }
       });
+
+      // 关闭损耗确认弹窗
+      this.lossDialogVisible = false;
+      this.lossQuantity = 0; // 清空损耗数量
     },
+
+
+
 
     showProgress() {
       return new Promise((resolve) => {
@@ -204,8 +204,6 @@ export default {
         }, 120); // 更新频率，可以根据需要调整
       });
     },
-
-
 
     search(){
       request.get("tech/search",{
