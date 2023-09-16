@@ -368,6 +368,8 @@ export default {
         request.post("tech/addTechRow", {
           productName: this.dialogData.productName,
           productId: this.dialogData.productId,
+          productNote:this.dialogData.productDescription,
+          productStandard:this.dialogData.productStandard,
           partsName: this.dialogData.partNameList[i],
           num: this.dialogData.numList[i]
         }).then(
@@ -377,6 +379,7 @@ export default {
                   message: "提交成功",
                   type: "success"
                 });
+                this.load();
                 this.dialogData.dialogVisible = false;
               } else {
                 this.$message.error(res.msg);
@@ -447,6 +450,8 @@ export default {
             message: this.successMsg,
             type: 'success'
           });
+          this.load();
+
         } else {
           this.$message({
             message: res.msg,
@@ -455,7 +460,7 @@ export default {
         }
 
       })
-      location.reload();
+      //location.reload();
     },
     edit(row){
       // 将行数据复制到编辑行数据中
@@ -483,7 +488,7 @@ export default {
       console.log('编辑提交', this.editRow);
       // 关闭编辑弹窗
       this.editVisible = false;
-      location.reload();
+      //location.reload();
     },
 
     delParts(row){
@@ -491,13 +496,17 @@ export default {
 
         if(res.code==='0'){
           this.$message({
-            message:res.msg,
+            message:"删除成功",
             type: 'success'
           });
+        }else{
+          this.$message({
+            message:res.msg,
+            type: 'error'
+          })
         }
       })
       row.delVisible=false
-      location.reload();
     },
 
     //new part add

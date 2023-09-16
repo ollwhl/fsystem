@@ -131,7 +131,7 @@ export default {
   },
   methods:{
     load(){
-      request.get("tech",{//get获取
+      request.get("tech/getProductWithPlan",{//get获取
         params: this.params
       }).then(res=> {//使用get方法请求/amdin
         if (res.code === '0'){
