@@ -348,9 +348,11 @@ export default {
       this.dialogData.checkPartsMessage = "零件存在"
     },
     submitForm() {//提交产品零件
-      if (!this.dialogData.productId) {
-        this.$message.error('产品编号不能为空');
-        return; // 如果产品编号为空，不执行后续操作
+      if (this.dialogData.checkMessage === "新增产品") {
+        if (!this.dialogData.productId) {
+          this.$message.error('产品编号不能为空');
+          return; // 如果产品编号为空且产品不存在，不执行后续操作
+        }
       }
       for (let i = 0; i < this.dialogData.partNameList.length; i++) {
         request.post("tech/addTechRow", {
@@ -384,6 +386,7 @@ export default {
 
     openPartsDialog(){
       const partsName = this.dialogData.partNameList[this.index];
+      console.log('openPartsDialog() method is called.');
       console.log(this.index)
       this.newPartsForm={}
       this.newPartsForm.name = partsName
