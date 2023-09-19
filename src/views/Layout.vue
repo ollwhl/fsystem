@@ -84,6 +84,12 @@
               <el-menu-item index="/lostconfirm">损耗确认</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
+          <el-menu-item index="/test">
+            <i class="el-icon-user-solid"></i>
+            <span slot="title">主页</span>
+          </el-menu-item>
+
+
 
 
 

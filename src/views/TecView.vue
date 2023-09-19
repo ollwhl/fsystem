@@ -76,57 +76,6 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button type="primary" @click="edit(scope.row)" >修改</el-button>
-
-
-
-
-
-
-          <el-dialog :visible.sync="partDialogVisible" title="新增零件">
-            <div>
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <span style="margin-right: 12px;">零件编号：</span>
-                <el-input v-model="newPartsForm.id" :style="{ width: '48%' }"  placeholder="在这里输入零件描述" />
-              </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <span style="margin-right: 12px;">零件名：</span>
-                <el-input v-model="newPartsForm.name" :style="{ width: '48%' }" placeholder="在这里输入零件名" />
-              </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <span style="margin-right: 12px;">零件类型：</span>
-                <el-select v-model="newPartsForm.group" placeholder="请选择仓库类型" style="width: 48%;">
-                  <el-option label="零件" value="零件仓库"></el-option>
-                  <el-option label="半成品" value="半成品仓库"></el-option>
-                </el-select>
-              </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <span style="margin-right: 12px;">零件规格：</span>
-                <el-input v-model="newPartsForm.standard" :style="{ width: '48%' }" placeholder="在这里输入零件描述" />
-              </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <span style="margin-right: 12px;">备件数：</span>
-                <el-input v-model="newPartsForm.preWarn" :style="{ width: '48%' }" placeholder="在这里输入备件数" />
-              </div>
-              <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="margin-right: 12px;">零件描述：</span>
-                <el-input v-model="newPartsForm.note" :style="{ width: '48%' }" placeholder="在这里输入零件描述" />
-              </div>
-
-
-            </div>
-            <span slot="footer" class="dialog-footer">
-    <el-button type="primary" @click="submitAddPartsForm">确定</el-button>
-    <el-button @click="partDialogVisible = false">取消</el-button>
-  </span>
-          </el-dialog>
-
-
-
-
-
-
-
-
           <el-popover
               placement="top"
               width="160"
@@ -168,6 +117,42 @@
           :total="total">
       </el-pagination>
     </div>
+
+    <el-dialog :visible.sync="partDialogVisible" title="新增零件" :style="{ 'z-index': 9999 }">
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span style="margin-right: 12px;">零件编号：</span>
+          <el-input v-model="newPartsForm.id" :style="{ width: '48%' }"  placeholder="在这里输入零件描述" />
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span style="margin-right: 12px;">零件名：</span>
+          <el-input v-model="newPartsForm.name" :style="{ width: '48%' }" placeholder="在这里输入零件名" />
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span style="margin-right: 12px;">零件类型：</span>
+          <el-select v-model="newPartsForm.group" placeholder="请选择仓库类型" style="width: 48%;">
+            <el-option label="零件" value="零件仓库"></el-option>
+            <el-option label="半成品" value="半成品仓库"></el-option>
+          </el-select>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span style="margin-right: 12px;">零件规格：</span>
+          <el-input v-model="newPartsForm.standard" :style="{ width: '48%' }" placeholder="在这里输入零件描述" />
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span style="margin-right: 12px;">备件数：</span>
+          <el-input v-model="newPartsForm.preWarn" :style="{ width: '48%' }" placeholder="在这里输入备件数" />
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="margin-right: 12px;">零件描述：</span>
+          <el-input v-model="newPartsForm.note" :style="{ width: '48%' }" placeholder="在这里输入零件描述" />
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="submitAddPartsForm">确定</el-button>
+              <el-button @click="partDialogVisible = false">取消</el-button>
+            </span>
+    </el-dialog>
   </div>
 
 </template>
@@ -186,10 +171,10 @@ export default {
 
       params: {
         keyword: "",
-        pageSize: "10",
-        pageNum: "1",
-
+        pageSize:10,
+        pageNum:1,
       },
+      total: 0,
 
 
       index:0,
@@ -261,6 +246,9 @@ export default {
           this.showProgress().then(()=> {
             this.tableData = res.data.list
             //开始 调用方法计算需要合并的数据
+            if (this.tableData.length === 0){
+              return
+            }
             for (let i = 0; i < Object.keys(this.tableData[0]).length; i++) {
               // 首先添加一个存放合并行数据的变量
               this.margeArray.push({Arr: [], Position: 0,})
@@ -400,6 +388,7 @@ export default {
       this.newPartsForm={}
       this.newPartsForm.name = partsName
       this.partDialogVisible = true;
+      console.log("???")
     },
     submitAddPartsForm() {//提交表单调用该方法
       if (!this.newPartsForm.id) {
