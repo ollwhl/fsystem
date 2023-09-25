@@ -23,11 +23,11 @@
         <!-- 在这里添加显示备货单的表格列 -->
         <el-table-column prop="name" label="零件名"></el-table-column>
         <el-table-column prop="id" label="编码"></el-table-column>
-        <el-table-column prop="num" label="数量"></el-table-column>
-        <el-table-column prop="min"  label="当前所需零件数量"></el-table-column>
-        <el-table-column prop="purchaseQuantity" label="进货量">
+        <el-table-column prop="num" label="库存"></el-table-column>
+        <el-table-column prop="min"  label="计划所需总零件数量"></el-table-column>
+        <el-table-column prop="purchaseQuantity" label="需要进货的数量">
         <template slot-scope="scope">
-          <span style="color: red;">{{ scope.row.purchaseQuantity }}</span>
+          <span style="color: #ff0000;">{{ scope.row.purchaseQuantity }}</span>
         </template>
         </el-table-column>
         <el-table-column prop="standard" label="规格"></el-table-column>
@@ -53,7 +53,7 @@
         class="parts-table"
     >
       <el-table-column prop="name" label="零件名" width="180"></el-table-column>
-      <el-table-column prop="num" label="数量" width="180"></el-table-column>
+      <el-table-column prop="num" label="库存" width="180"></el-table-column>
       <el-table-column prop="standard" label="规格"></el-table-column>
       <el-table-column prop="id" label="编码"></el-table-column>
       <el-table-column prop="group" label="仓库"></el-table-column>

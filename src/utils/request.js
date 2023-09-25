@@ -1,6 +1,7 @@
 import axios from 'axios'
 const request = axios.create({
     baseURL:'http://157.7.205.120:8081/api',
+    //baseURL:'http://localhost:8081/api',
     timeout: 5000
 })
 

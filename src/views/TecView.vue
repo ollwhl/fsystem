@@ -22,16 +22,10 @@
             <div style="display: flex; align-items: center;">
               <span style="margin-right: 12px;">产品名：</span>
               <el-input v-model="dialogData.productName" :style="{ width: '50%' ,marginBottom: '10px'}" @input="handleInput" placeholder="在这里输入内容" />
-              <span>{{dialogData.checkMessage}}</span>
+              <span>{{dialogData.checkProductMessage}}</span>
             </div>
             <template v-if="showProductDetails">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <el-input v-model="dialogData.productId" :style="{ width: '50%' ,marginBottom: '5px'}" placeholder="产品编号" />
-                <div style="width: 10px;"></div>
-              <el-input v-model="dialogData.productStandard" :style="{ width: '50%' ,marginBottom: '5px' }" placeholder="产品规格" />
-                <div style="width: 10px;"></div>
-              <el-input v-model="dialogData.productDescription"  :style="{ width: '50%' ,marginBottom: '5px'}"placeholder="产品描述" />
-              </div>
+              <el-button type="primary" class="action-button" @click="openProductDialog()">向仓库添加新产品</el-button>
             </template>
             <div v-for="(text, index) in dialogData.partNameList" :key="index">
               <div style="display: flex; align-items: center;">
@@ -44,7 +38,7 @@
               </div>
             </div>
             <span>{{dialogData.checkPartsMessage}}</span>
-            <template v-if="dialogData.checkPartsMessage === '仓库中不存在该零件，请先向仓库添加该零件'">
+            <template v-if="dialogData.checkPartsMessage === '仓库中不存在该零件，请先填写零件信息'">
               <el-button type="primary" class="action-button" @click="openPartsDialog()">向仓库添加新零件</el-button>
             </template>
           </div>
@@ -122,7 +116,7 @@
       <div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
           <span style="margin-right: 12px;">零件编号：</span>
-          <el-input v-model="newPartsForm.id" :style="{ width: '48%' }"  placeholder="在这里输入零件描述" />
+          <el-input v-model="newPartsForm.id" :style="{ width: '48%' }"  placeholder="在这里输入零件编号" />
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
           <span style="margin-right: 12px;">零件名：</span>
@@ -137,7 +131,7 @@
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
           <span style="margin-right: 12px;">零件规格：</span>
-          <el-input v-model="newPartsForm.standard" :style="{ width: '48%' }" placeholder="在这里输入零件描述" />
+          <el-input v-model="newPartsForm.standard" :style="{ width: '48%' }" placeholder="在这里输入零件规格" />
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
           <span style="margin-right: 12px;">备件数：</span>
@@ -151,6 +145,31 @@
       <span slot="footer" class="dialog-footer">
               <el-button type="primary" @click="submitAddPartsForm">确定</el-button>
               <el-button @click="partDialogVisible = false">取消</el-button>
+            </span>
+    </el-dialog>
+
+    <el-dialog :visible.sync="productDialogVisible" title="新增总成" :style="{ 'z-index': 9999 }">
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span style="margin-right: 12px;">总成编号：</span>
+          <el-input v-model="newProductForm.id" :style="{ width: '48%' }"  placeholder="在这里输入总成编号" />
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span style="margin-right: 12px;">总成名：</span>
+          <el-input v-model="newProductForm.name" :style="{ width: '48%' }" placeholder="在这里输入总成名" />
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span style="margin-right: 12px;">总成规格：</span>
+          <el-input v-model="newProductForm.standard" :style="{ width: '48%' }" placeholder="在这里输入总成描述" />
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="margin-right: 12px;">总成描述：</span>
+          <el-input v-model="newProductForm.note" :style="{ width: '48%' }" placeholder="在这里输入总成描述" />
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="submitAddProductForm">确定</el-button>
+              <el-button @click="productDialogVisible = false">取消</el-button>
             </span>
     </el-dialog>
   </div>
@@ -178,13 +197,13 @@ export default {
 
 
       index:0,
-      addProductDialogVisible: false,
+      productDialogVisible: false,
       newProductForm: {
-        productName: "",
-        partsName:"",
-        num:"",
+        id:"",
+        name:"",
+        standard:"",
+        note:""
       },
-
       partDialogVisible:false,
       newPartsForm:{
         id:"",
@@ -194,8 +213,6 @@ export default {
         note:"",
         group:"",
       },
-
-
       //edit
       editVisible: false,
       editRow: {},
@@ -203,17 +220,13 @@ export default {
       dialogData: {
         dialogVisible: false,
         productName: '',
-        productId:'',
         partNameList: [''], // 初始有一个输入框
         numList: [''],
-        checkMessage: '', // 存储检查后的消息
+        checkProductMessage: '', // 存储检查后的消息
         checkPartsMessage: "",
-        productStandard: "",
-        productDescription: ""
       },
 
-      showProductDetails: true,
-      showPartsDetails:true,
+      showProductDetails: false,
 
 
       successMsg: "",
@@ -228,7 +241,7 @@ export default {
   },
   computed: {
     isDisabled() {
-      return this.dialogData.checkPartsMessage === "仓库中不存在该零件，请先向仓库添加该零件"|| this.dialogData.checkPartsMessage === ""
+      return this.dialogData.checkPartsMessage === "仓库中不存在该零件，请先填写零件信息"|| this.dialogData.checkPartsMessage === ""
     }
   },
   methods: {
@@ -298,7 +311,7 @@ export default {
         productName: '',
         partNameList: [''], // 初始有一个输入框
         numList: [''],
-        checkMessage: '', // 存储检查后的消息
+        checkProductMessage: '', // 存储检查后的消息
         checkPartsMessage: ""
       },
           this.dialogData.dialogVisible = true;
@@ -308,11 +321,11 @@ export default {
       request.get(`parts/findProductByName?name=${productName}`)
           .then(res => {
             if (res.code === '0') {
-              this.dialogData.checkMessage = "产品已存在,新增构成";
+              this.dialogData.checkProductMessage = "总成已存在,新增构成";
               this.showProductDetails = false;
               //console.log("ok");
             } else {
-              this.dialogData.checkMessage = "新增产品";
+              this.dialogData.checkProductMessage = "仓库中不存在该总成，请先填写总成信息";
               //console.log("not ok");
               this.showProductDetails = true;
             }
@@ -327,7 +340,7 @@ export default {
               this.dialogData.checkPartsMessage = "零件存在"
               console.log("ok")
             } else {
-              this.dialogData.checkPartsMessage = "仓库中不存在该零件，请先向仓库添加该零件"
+              this.dialogData.checkPartsMessage = "仓库中不存在该零件，请先填写零件信息"
               console.log(" no ok")
             }
           });
@@ -348,7 +361,7 @@ export default {
       this.dialogData.checkPartsMessage = "零件存在"
     },
     submitForm() {//提交产品零件
-      if (this.dialogData.checkMessage === "新增产品") {
+      if (this.dialogData.checkProductMessage === "新增产品") {
         if (!this.dialogData.productId) {
           this.$message.error('产品编号不能为空');
           return; // 如果产品编号为空且产品不存在，不执行后续操作
@@ -357,9 +370,6 @@ export default {
       for (let i = 0; i < this.dialogData.partNameList.length; i++) {
         request.post("tech/addTechRow", {
           productName: this.dialogData.productName,
-          productId: this.dialogData.productId,
-          productNote:this.dialogData.productDescription,
-          productStandard:this.dialogData.productStandard,
           partsName: this.dialogData.partNameList[i],
           num: this.dialogData.numList[i]
         }).then(
@@ -386,12 +396,12 @@ export default {
 
     openPartsDialog(){
       const partsName = this.dialogData.partNameList[this.index];
-      console.log('openPartsDialog() method is called.');
-      console.log(this.index)
+      //console.log('openPartsDialog() method is called.');
+      //console.log(this.index)
       this.newPartsForm={}
       this.newPartsForm.name = partsName
       this.partDialogVisible = true;
-      console.log("???")
+      //console.log("???")
     },
     submitAddPartsForm() {//提交表单调用该方法
       if (!this.newPartsForm.id) {
@@ -402,8 +412,6 @@ export default {
         this.$message.error('仓库不能为空');
         return;
       }
-
-
       request.post("parts/addParts", {
         id:this.newPartsForm.id,
         name:this.newPartsForm.name,
@@ -426,6 +434,42 @@ export default {
         }
 
       })
+    },
+    openProductDialog(){
+      const productName = this.dialogData.productName
+      console.log(productName)
+      this.newProductForm = {}
+      this.newProductForm.name = productName
+      this.productDialogVisible = true
+    },
+    submitAddProductForm(){
+      if (!this.newProductForm.id) {
+        this.$message.error('总成编号不能为空');
+        return; // 如果零件编号为空，不执行后续操作
+      }
+      request.post("parts/addParts", {
+        id:this.newProductForm.id,
+        name:this.newProductForm.name,
+        standard:this.newProductForm.standard,
+        note:this.newProductForm.note
+      }).then(res => {
+        if (res.code === '0') {
+          this.productDialogVisible = false
+          this.dialogData.checkProductMessage = "已添加总成信息"
+          this.showProductDetails = false;
+          this.$message({
+            message: '总成添加成功',
+            type: 'success'
+          });
+        } else {
+          this.$message({
+            message: res.msg,
+            type: 'error'
+          });
+        }
+
+      })
+
     },
 
 
