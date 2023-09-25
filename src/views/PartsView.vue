@@ -53,15 +53,27 @@
         class="parts-table"
     >
       <el-table-column prop="name" label="零件名" width="180"></el-table-column>
-      <el-table-column prop="num" label="库存" width="180"></el-table-column>
+      <el-table-column prop="num" label="库存" width="180">
+        <template slot-scope="scope">
+    <span :style="{ color: scope.row.num < scope.row.min ? 'red' : 'black' }">
+      {{ scope.row.num }}
+    </span>
+        </template>
+      </el-table-column>
       <el-table-column prop="standard" label="规格"></el-table-column>
       <el-table-column prop="id" label="编码"></el-table-column>
       <el-table-column prop="group" label="仓库"></el-table-column>
       <el-table-column prop="preWarn" label="备件数"></el-table-column>
       <el-table-column prop="confirm" label="等待交付确认"></el-table-column>
-      <el-table-column prop="min"  label="当前所需零件数量"></el-table-column>
+      <el-table-column prop="min"  label="当前所需零件数量">
+        <template slot-scope="scope">
+    <span :style="{ color: scope.row.num < scope.row.min ? 'red' : 'blue' }">
+      {{ scope.row.min }}
+    </span>
+        </template>
+      </el-table-column>
       <el-table-column prop="note" label="备注"></el-table-column>
-      <el-table-column label="操作" width="200">
+      <el-table-column v-if="user.group === '零件仓库' || user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'" label="操作" width="200">
         <template slot-scope="scope">
           <el-popover placement="top" width="160" v-model="scope.row.addVisible">
             <el-input v-model="scope.row.addInput" placeholder="请输入内容"></el-input>

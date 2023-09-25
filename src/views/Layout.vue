@@ -26,15 +26,15 @@
             <i class="el-icon-user-solid"></i>
             <span slot="title">主页</span>
           </el-menu-item>
-          <el-submenu v-if="user.group === '管理员'" index="1" >
+          <el-submenu  index="1" >
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>人员管理</span>
+              <span>管理</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="/admin">员工</el-menu-item>
+              <el-menu-item  v-if="user.group === '管理员'" index="/admin">员工</el-menu-item>
 
-              <el-menu-item index="/notice">系统公告</el-menu-item>
+              <el-menu-item   index="/notice">系统公告</el-menu-item>
 
             </el-menu-item-group>
           </el-submenu>
@@ -44,7 +44,7 @@
               <span>仓库管理</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="/parts" v-if="user.group === '零件仓库' || user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'">零件库存</el-menu-item>
+              <el-menu-item index="/parts" v-if="user.group === '零件仓库' || user.group === '计划部' ||user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'">零件库存</el-menu-item>
               <el-menu-item index="/log"　 v-if="user.group === '管理员'">修改日志</el-menu-item>
               <el-menu-item index="/product" >产品库存</el-menu-item>
             </el-menu-item-group>
@@ -79,15 +79,13 @@
               <span>生产车间</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="/factory">生产进度确认</el-menu-item>
+              <el-menu-item index="/factory">已交付数量</el-menu-item>
               <el-menu-item index="/partsconfirm">零件确认</el-menu-item>
               <el-menu-item index="/lostconfirm">损耗确认</el-menu-item>
+
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item index="/test">
-            <i class="el-icon-user-solid"></i>
-            <span slot="title">主页</span>
-          </el-menu-item>
+
 
 
 

@@ -12,6 +12,7 @@
       <el-table-column prop="name" label="姓名" width="120"></el-table-column>
       <el-table-column prop="phone" label="电话" width="300"></el-table-column>
       <el-table-column prop="note" label="附录" ></el-table-column>
+      <el-table-column prop="group" label="部门" ></el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <div class="action-buttons">

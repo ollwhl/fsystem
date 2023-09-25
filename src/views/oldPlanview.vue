@@ -34,14 +34,21 @@
 
 
         <template slot-scope="scope">
-          <el-button type="primary" @click="editPlan(scope.row)">修改</el-button>
+          <el-button  v-if ="user.group === '管理员' || user.group === '计划部'"
+                     type="primary"
+                     @click="editPlan(scope.row)">修改</el-button>
           <el-popover placement="top" width="160" v-model="scope.row.delVisible">
             <p>确定完成吗？</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="cancel(scope.row,'del')">取消</el-button>
               <el-button type="primary" size="mini" @click="delPlan(scope.row)">确定</el-button>
             </div>
-            <el-button slot="reference" style="margin-left: 10px">确认完成</el-button>
+            <el-button  v-if ="user.group === '管理员' || user.group === '生产部'"
+
+                        slot="reference"
+                        style="margin-left: 10px">
+              确认完成
+            </el-button>
           </el-popover>
 
         </template>
@@ -100,6 +107,7 @@ import request from "@/utils/request";
 export default {
   name:"PartsView",
   data(){
+
     return {
       params:{
 
@@ -122,6 +130,8 @@ export default {
 
       showProgressbar: false, // 是否显示生产进度条
       progressPercentage: 0, // 生产进度百分比
+      user:localStorage.getItem("user")?JSON.parse(localStorage.getItem("user")):{},
+
 
     }
   },

@@ -1,9 +1,9 @@
 <template>
   <div class="notice-view">
     <div class="action-bar">
-      <el-input v-model="addForm.title" placeholder="请输入公告标题" :style="{ width: '50%' }"></el-input>
+      <el-input  v-if="user.group === '管理员' || user.group === '计划部' || user.group === '科技部'"v-model="addForm.title" placeholder="请输入公告标题" :style="{ width: '50%' }"></el-input>
 
-      <el-button type="primary" class="action-button" @click="add('dialogAddForm')">新增 </el-button>
+      <el-button  v-if="user.group === '管理员' || user.group === '计划部' || user.group === '科技部'" type="primary" class="action-button" @click="add('dialogAddForm')">新增 </el-button>
     </div>
     <!-- 生产进度条 -->
     <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
@@ -13,7 +13,7 @@
       <el-table-column prop="msg" label="公告内容" width="300"></el-table-column>
       <el-table-column prop="time" label="发布时间" width="300"></el-table-column>
 
-      <el-table-column label="操作" width="200">
+      <el-table-column v-if="user.group === '管理员' || user.group === '计划部' || user.group === '科技部'" label="操作" width="200">
         <template slot-scope="scope">
           <div class="action-buttons">
             <el-button type="danger" @click="showDeleteConfirm(scope.row)">删除</el-button>
@@ -100,6 +100,7 @@ export default {
 
       showProgressbar: false, // 是否显示生产进度条
       progressPercentage: 0, // 生产进度百分比
+      user:localStorage.getItem("user")?JSON.parse(localStorage.getItem("user")):{},
     }
   },
   created() {//页面创建时调用的方法
