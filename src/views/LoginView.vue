@@ -3,7 +3,7 @@
     <h1 class="login-title">LOGIN</h1>
     <div class="login-form">
       <el-input v-model="username" placeholder="帐号" class="login-input"></el-input>
-      <el-input placeholder="请输入密码" v-model="password" show-password class="login-input"></el-input>
+      <el-input placeholder="请输入密码" v-model="password" show-password class="login-input" @keyup.enter="login"></el-input>
       <el-button type="primary" @click="login" class="login-button">登录</el-button>
     </div>
   </div>
