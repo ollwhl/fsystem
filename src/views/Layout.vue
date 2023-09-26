@@ -10,7 +10,7 @@
           {{user.name}}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
             <el-dropdown-menu slot="dropdown" style="background-color: #333;">
-              <el-dropdown-item icon="el-icon-switch-button"><div @click="logout()">退出登录</div></el-dropdown-item>
+              <el-dropdown-item ><div @click="logout()">退出登录</div></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
