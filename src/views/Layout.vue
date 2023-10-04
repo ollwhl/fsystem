@@ -2,7 +2,7 @@
   <div id="app">
     <el-container>
       <el-header style="background-color: #0f2027; color: white; font-size: 20px; position: relative;">
-        <img src="@/assets/logo.png" style="width: 35px">
+        <!--<img src="@/assets/logo.png" style="width: 35px">!-->
         <div class="dropdown-container">
           <el-dropdown trigger="click" placement="bottom-end">
         <span class="el-dropdown-link" style="color: #FF9900;">
@@ -46,7 +46,7 @@
             <el-menu-item-group>
               <el-menu-item index="/parts" v-if="user.group === '零件仓库' || user.group === '计划部' ||user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'">零件库存</el-menu-item>
               <el-menu-item index="/log"　 v-if="user.group === '管理员'">修改日志</el-menu-item>
-              <el-menu-item index="/product" >产品库存</el-menu-item>
+              <el-menu-item index="/product"  v-if=" user.group === '计划部' ||user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'">产品库存</el-menu-item>
             </el-menu-item-group>
 
           </el-submenu>

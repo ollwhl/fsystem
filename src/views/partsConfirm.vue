@@ -91,6 +91,7 @@ export default {
         productName: '',
         produced: 0,
       }
+
     }
   },
   created() {//页面创建时调用的方法

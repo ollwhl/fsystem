@@ -25,7 +25,7 @@
       </el-table-column>
       <el-table-column prop="note" label="备注"></el-table-column>
       <el-table-column
-          v-if ="user.group === '管理员' || user.group === '生产部'"
+          v-if ="user.group === '管理员' || user.group === '总成仓库'"
           label="操作" width="200">
         <template slot-scope="scope">
           <el-button type="primary" @click="confirmReceipt(scope.row)">确认收货</el-button>

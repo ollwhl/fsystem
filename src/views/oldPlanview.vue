@@ -14,7 +14,7 @@
       <el-table-column prop="name" label="产品名称" width="180"></el-table-column>
       <el-table-column prop="planNum" label="计划数量">
         <template slot-scope="scope">
-          <span :style="{ color: 'red' }">{{ scope.row.planNum }}</span>
+          <span :style="{ color: 'green' }">{{ scope.row.planNum }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="produced" label="已生产数量">
@@ -30,7 +30,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="200">
+      <el-table-column  v-if ="user.group === '管理员' || user.group === '计划部'" label="操作" width="200">
 
 
         <template slot-scope="scope">

@@ -73,7 +73,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="note" label="备注"></el-table-column>
-      <el-table-column v-if="user.group === '零件仓库' || user.group === '管理员'|| user.group === '半成品仓库' || user.group === '总成仓库'" label="操作" width="200">
+      <el-table-column v-if="user.group === '零件仓库' || user.group === '管理员'|| user.group === '半成品仓库' " label="操作" width="200">
         <template slot-scope="scope">
           <el-popover placement="top" width="160" v-model="scope.row.addVisible">
             <el-input v-model="scope.row.addInput" placeholder="请输入内容"></el-input>
@@ -156,17 +156,22 @@ export default {
       }else{
         url = "/parts/getAllParts"
       }
-      request.get(url,{
-        params:this.params
-      }).then(res=>{
-        if (res.code === '0'){
-          this.showProgress().then(()=> {
-            this.tableData = res.data.list
-            this.total =res.data.total//更新总条数
-          })
+      request.get(url, {
+        params: this.params
+      }).then(res => {
+        if (res.code === '0') {
+          this.showProgress().then(() => {
+            // 根据用户group过滤零件数据
+            if (group === "零件仓库" || group === "半成品仓库") {
+              this.tableData = res.data.list.filter(item => item.group === group);
+            } else {
+              this.tableData = res.data.list;
+            }
+            this.total = res.data.total; // 更新总条数
+          });
         }
-      })
-      },
+      });
+    },
     cancel(row, popoverName) {
       row.addInput = "";
       row.redInput = "";
