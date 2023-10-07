@@ -92,6 +92,11 @@ const routes = [
       name: 'notice',
     component: () => import('../views/Notice.vue')
     },
+        {
+            path: '/warning',
+            name: 'warning',
+            component: () => import('../views/warningView')
+        },
     ]
   },
 

@@ -87,7 +87,18 @@
           </el-submenu>
 
 
+          <el-submenu  index="6" >
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>工作日志</span>
+            </template>
+            <el-menu-item-group>
 
+
+              <el-menu-item   index="/warning">预警设置</el-menu-item>
+
+            </el-menu-item-group>
+          </el-submenu>
 
 
 
