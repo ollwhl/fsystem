@@ -140,6 +140,10 @@ export default {
       id:"",
       date:"",
       productName:"",
+      partsTime: "",
+      halfTime:"",
+      producerTime:"",
+      exportTime:"",
       tableData: [],
       name: "",
 
