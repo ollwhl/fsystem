@@ -9,14 +9,41 @@
       <el-progress v-if="showProgressbar" :percentage="progressPercentage" />
 
     <!-- 新增弹窗 -->
-    <el-dialog :visible.sync="addVisible" title="新增计划">
-      <el-form :model="addRow" ref="addForm" label-width="100px">
+    <el-dialog :visible.sync="addVisible" title="新增计划" width="40%">
+      <el-form :model="addRow" ref="addForm" label-width="90px" class="form-container">
 
-        <el-form-item label="产品名称">
-          <el-input v-model="addRow.name":disabled="true"></el-input>
+        <el-form-item label="产品名称" class="quarter-width">
+          <el-input v-model="addRow.name" :disabled="true" ></el-input>
         </el-form-item>
-        <el-form-item label="数量">
-          <el-input v-model="addRow.planNum"></el-input>
+        <el-form-item label="数量" class="quarter-width">
+          <el-input v-model="addRow.planNum" ></el-input>
+        </el-form-item>
+        <el-form-item label="零件最晚入库时间">
+          <el-date-picker v-model="editRow.partsTime" placeholder="选择日期时间" value-format="yyyy-MM-dd "></el-date-picker>
+        </el-form-item>
+        <el-form-item label="半成品最晚入库">
+          <el-date-picker v-model="editRow.halfTime"
+
+                          placeholder="选择日期时间"
+                          value-format="yyyy-MM-dd">
+
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="车间最迟完工">
+          <el-date-picker v-model="editRow.producerTime"
+
+                          placeholder="选择日期时间"
+                          value-format="yyyy-MM-dd">
+
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="最迟发货">
+          <el-date-picker v-model="editRow.exportTime"
+
+                          placeholder="选择日期时间"
+                          value-format="yyyy-MM-dd">
+
+          </el-date-picker>
         </el-form-item>
         <el-form-item label="截止日期">
           <!-- Use el-date-picker for selecting a date -->
@@ -39,9 +66,9 @@
     >
 <!--      <el-table-column prop="name" label="产品名称" width="180"></el-table-column>-->
       <el-table-column prop="name" label="产品名称" width="180"></el-table-column>
-      <el-table-column prop="produced" label="已完成数量"></el-table-column>
-      <el-table-column prop="planNum" label="计划数量"></el-table-column>
-      <el-table-column prop="planDate" label="截止期限"></el-table-column>
+      <el-table-column prop="produced" label="已完成数量" ></el-table-column>
+      <el-table-column prop="planNum" label="计划数量" ></el-table-column>
+      <el-table-column prop="planDate" label="截止期限" width="300"></el-table-column>
 
       <el-table-column label="操作" width="200">
 
@@ -56,12 +83,12 @@
 
     <!-- 编辑弹窗 -->
     <el-dialog :visible.sync="editVisible" title="编辑计划">
-      <el-form :model="editRow" ref="editForm" label-width="100px">
-        <el-form-item label="计划数量">
+      <el-form :model="editRow" ref="editForm" label-width="75px">
+        <el-form-item label="计划数量"  width="180">
           <el-input v-model="editRow.planNum"></el-input>
         </el-form-item>
 
-        <el-form-item label="截止日期">
+        <el-form-item label="截止日期"  width="180">
           <el-input v-model="editRow.planDate"></el-input>
         </el-form-item>
 
@@ -180,6 +207,7 @@ export default {
       this.addRow = {
         name: row.name,
         planNum: '',
+
         planDate: ''
       }; // 清空新增数据
       this.addVisible = true;
@@ -190,6 +218,22 @@ export default {
     },
     // 保存新增
     saveAdd() {
+      const partsTimeTimestamp = new Date(this.editRow.partsTime).getTime();
+      const halfTimeTimestamp = new Date(this.editRow.halfTime).getTime();
+      const exportTimeTimestamp = new Date(this.editRow.exportTime).getTime();
+      const planDateTimestamp = new Date(this.editRow.planDate).getTime();
+
+      // 检查零件最晚入库时间和半成品最晚入库时间是否晚于最迟发货时间
+      if (partsTimeTimestamp > exportTimeTimestamp || halfTimeTimestamp > exportTimeTimestamp) {
+        this.$message.error("零件最晚入库时间和半成品最晚入库时间不能晚于最迟发货时间");
+        return;
+      }
+
+      // 检查最迟发货时间是否晚于截止日期
+      if (exportTimeTimestamp > planDateTimestamp) {
+        this.$message.error("最迟发货时间不能晚于截止日期");
+        return;
+      }
       if (!this.addRow.planNum || !this.addRow.planDate) {
         this.$message.error("数量和截止日期不能为空");
         return;
@@ -275,4 +319,8 @@ export default {
 .container {
   margin-bottom: 20px; /* 在底部添加20像素的外边距，根据需要调整间距大小 */
 }
+.quarter-width{
+  width: 300px;
+}
+
 </style>

@@ -58,12 +58,12 @@
     </el-table>
 
     <!-- 编辑弹窗 -->
-    <el-dialog :visible.sync="editVisible" title="编辑计划">
+    <el-dialog :visible.sync="editVisible" title="编辑计划" width="40%">
       <el-form :model="editRow" ref="editForm" label-width="100px">
-        <el-form-item label="计划数量">
+        <el-form-item label="计划数量" class="quarter-width">
           <el-input v-model="editRow.planNum"></el-input>
         </el-form-item>
-          <el-form-item label="已完成数量">
+          <el-form-item label="已完成数量" class="quarter-width">
             <el-input v-model="editRow.produced"></el-input>
           </el-form-item>
             <el-form-item label="截止日期">
@@ -242,3 +242,12 @@ export default {
 
 }
 </script>
+
+
+<style scoped>
+/* 自定义 CSS 样式规则 */
+
+.quarter-width{
+  width: 300px;
+}
+</style>

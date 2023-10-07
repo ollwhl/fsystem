@@ -188,6 +188,23 @@ export default {
     },
     // 保存编辑
     saveEdit() {
+      const partsTimeTimestamp = new Date(this.editRow.partsTime).getTime();
+      const halfTimeTimestamp = new Date(this.editRow.halfTime).getTime();
+      const exportTimeTimestamp = new Date(this.editRow.exportTime).getTime();
+      const planDateTimestamp = new Date(this.editRow.planDate).getTime();
+
+      // 检查零件最晚入库时间和半成品最晚入库时间是否晚于最迟发货时间
+      if (partsTimeTimestamp > exportTimeTimestamp || halfTimeTimestamp > exportTimeTimestamp) {
+        this.$message.error("零件最晚入库时间和半成品最晚入库时间不能晚于最迟发货时间");
+        return;
+      }
+
+      // 检查最迟发货时间是否晚于截止日期
+      if (exportTimeTimestamp > planDateTimestamp) {
+        this.$message.error("最迟发货时间不能晚于截止日期");
+        return;
+      }
+
       request.post("plan/editPlan", this.editRow).then((res) => {
         if (res.code === "0") {
           this.$message.success("时间修改成功");
