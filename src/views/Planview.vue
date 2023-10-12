@@ -19,10 +19,10 @@
           <el-input v-model="addRow.planNum" ></el-input>
         </el-form-item>
         <el-form-item label="零件最晚入库时间">
-          <el-date-picker v-model="editRow.partsTime" placeholder="选择日期时间" value-format="yyyy-MM-dd "></el-date-picker>
+          <el-date-picker v-model="addRow.partsDate" placeholder="选择日期时间" value-format="yyyy-MM-dd "></el-date-picker>
         </el-form-item>
         <el-form-item label="半成品最晚入库">
-          <el-date-picker v-model="editRow.halfTime"
+          <el-date-picker v-model="addRow.halfDate"
 
                           placeholder="选择日期时间"
                           value-format="yyyy-MM-dd">
@@ -30,7 +30,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="车间最迟完工">
-          <el-date-picker v-model="editRow.producerTime"
+          <el-date-picker v-model="addRow.producerTime"
 
                           placeholder="选择日期时间"
                           value-format="yyyy-MM-dd">
@@ -38,7 +38,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="最迟发货">
-          <el-date-picker v-model="editRow.exportTime"
+          <el-date-picker v-model="addRow.exportTime"
 
                           placeholder="选择日期时间"
                           value-format="yyyy-MM-dd">

@@ -15,22 +15,22 @@
       <el-table-column prop="name" label="产品名称" width="180"></el-table-column>
       <el-table-column prop="partsTime" label="零件最晚入库时间">
         <template slot-scope="scope">
-          <span :style="{ color: 'green' }">{{ scope.row.partsTime }}</span>
+          <span :style="{ color: 'green' }">{{ scope.row.partsDate }}</span>
         </template>
       </el-table-column>
         <el-table-column prop="halfTime" label="半成品最晚入库时间">
         <template slot-scope="scope">
-          <span :style="{ color: 'green' }">{{ scope.row.halfTime }}</span>
+          <span :style="{ color: 'green' }">{{ scope.row.halfDate }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="producerTime" label="车间最迟完工时间">
         <template slot-scope="scope">
-          <span :style="{ color: 'blue' }">{{ scope.row.producerTime }}</span>
+          <span :style="{ color: 'blue' }">{{ scope.row.producerDate }}</span>
         </template>
       </el-table-column>
         <el-table-column prop="exportTime" label="最迟发货时间">
           <template slot-scope="scope">
-            <span :style="{ color: 'red' }">{{ scope.row.exportTime }}</span>
+            <span :style="{ color: 'red' }">{{ scope.row.exportDate }}</span>
           </template>
       </el-table-column>
 
@@ -70,7 +70,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="车间最迟完工">
-          <el-date-picker v-model="editRow.exportTime"
+          <el-date-picker v-model="editRow.producerDate"
 
                           placeholder="选择日期时间"
                           value-format="yyyy-MM-dd">
@@ -78,7 +78,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="最迟发货">
-          <el-date-picker v-model="editRow.partsTime"
+          <el-date-picker v-model="editRow.exportDate"
 
                           placeholder="选择日期时间"
                           value-format="yyyy-MM-dd">
@@ -140,10 +140,10 @@ export default {
       id:"",
       date:"",
       productName:"",
-      partsTime: "",
-      halfTime:"",
-      producerTime:"",
-      exportTime:"",
+      partsDate: "",
+      halfDate:"",
+      producerDate:"",
+      exportDate:"",
       tableData: [],
       name: "",
 
@@ -188,9 +188,9 @@ export default {
     },
     // 保存编辑
     saveEdit() {
-      const partsTimeTimestamp = new Date(this.editRow.partsTime).getTime();
-      const halfTimeTimestamp = new Date(this.editRow.halfTime).getTime();
-      const exportTimeTimestamp = new Date(this.editRow.exportTime).getTime();
+      const partsTimeTimestamp = new Date(this.editRow.partsDate).getTime();
+      const halfTimeTimestamp = new Date(this.editRow.halfDate).getTime();
+      const exportTimeTimestamp = new Date(this.editRow.exportDate).getTime();
       const planDateTimestamp = new Date(this.editRow.planDate).getTime();
 
       // 检查零件最晚入库时间和半成品最晚入库时间是否晚于最迟发货时间

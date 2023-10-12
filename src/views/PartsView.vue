@@ -26,9 +26,16 @@
         <el-table-column prop="num" label="库存"></el-table-column>
         <el-table-column prop="min"  label="计划所需总零件数量"></el-table-column>
         <el-table-column prop="purchaseQuantity" label="需要进货的数量">
+
         <template slot-scope="scope">
           <span style="color: #ff0000;">{{ scope.row.purchaseQuantity }}</span>
         </template>
+        </el-table-column>
+        <el-table-column prop="partsTime" label="最晚入库时间">
+          <template slot-scope="scope">
+            <span v-if="scope.row.halfTime">{{ scope.row.halfTime }}</span>
+            <span v-else>{{ scope.row.partsTime }}</span>
+          </template>
         </el-table-column>
         <el-table-column prop="standard" label="规格"></el-table-column>
         <!-- 其他需要显示的列 -->
