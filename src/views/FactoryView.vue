@@ -43,7 +43,7 @@
 
 
 
-      <el-table-column prop="planDate" label="截止日期" :width="250"></el-table-column>
+      <el-table-column prop="producerDate" label="完工日期" :width="250"></el-table-column>
       <el-table-column label="生产进度" :width="250">
         <template slot-scope="scope">
           <el-progress :percentage="producePercent(scope.row)"></el-progress>

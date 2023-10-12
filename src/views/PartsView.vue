@@ -14,6 +14,7 @@
         title="备货单"
         :width="'80%'"
     >
+      <el-button type="action" class="action-button" @click="downloadStockOrderExcel">下载备货单</el-button>
       <el-table
           :data="stockOrderList"
           height="300"
@@ -26,9 +27,16 @@
         <el-table-column prop="num" label="库存"></el-table-column>
         <el-table-column prop="min"  label="计划所需总零件数量"></el-table-column>
         <el-table-column prop="purchaseQuantity" label="需要进货的数量">
+
         <template slot-scope="scope">
           <span style="color: #ff0000;">{{ scope.row.purchaseQuantity }}</span>
         </template>
+        </el-table-column>
+        <el-table-column prop="partsTime" label="最晚入库时间">
+          <template slot-scope="scope">
+            <span v-if="scope.row.halfDate">{{ scope.row.halfDate }}</span>
+            <span v-else>{{ scope.row.partsDate }}</span>
+          </template>
         </el-table-column>
         <el-table-column prop="standard" label="规格"></el-table-column>
         <!-- 其他需要显示的列 -->
@@ -113,6 +121,7 @@
 
 <script>
 import request from "@/utils/request";
+import XLSX from 'xlsx';
 export default {
   name:"PartsView",
   data(){
@@ -139,6 +148,7 @@ export default {
 
       showProgressbar: false, // 是否显示生产进度条
       progressPercentage: 0, // 生产进度百分比
+
 
     }
   },
@@ -231,9 +241,27 @@ export default {
       // 打开备货单弹窗
       this.stockOrderVisible = true;
     },
+    downloadStockOrderExcel() {
+      // 调用导出 Excel 的方法并传递备货单数据
+      this.exportToExcel(this.stockOrderList);
+    },
 
+    exportToExcel(stockOrderList) {
+      const worksheet = XLSX.utils.json_to_sheet(stockOrderList);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, '备货单');
 
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
 
+      // 创建一个下载链接并模拟点击
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '备货单.xlsx';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    },
 
 
 

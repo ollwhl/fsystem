@@ -23,6 +23,7 @@
 <!--          <span :style="{ color: 'red' }">{{ scope.row.planNum }}</span>-->
 <!--        </template>-->
       </el-table-column>
+      <el-table-column prop="exportDate" label="最迟发货"></el-table-column>
       <el-table-column prop="note" label="备注"></el-table-column>
       <el-table-column
           v-if ="user.group === '管理员' || user.group === '总成仓库'"
