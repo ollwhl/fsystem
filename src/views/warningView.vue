@@ -36,7 +36,7 @@
 
       <el-table-column prop="planDate" label="截止期限">
         <template slot-scope="scope">
-          <span :style="{ color: isDeadlineNear(scope.row.planDate) ? 'red' : 'green' }">{{ scope.row.planDate }}</span>
+          <span :style="{ color: isDeadlineNear(scope.row.planDate) ? 'red' : 'green' }">{{scope.row.planDate }}</span>
         </template>
       </el-table-column>
 
@@ -59,10 +59,10 @@
     <el-dialog :visible.sync="editVisible" title="编辑计划">
       <el-form :model="editRow" ref="editForm" label-width="100px">
         <el-form-item label="零件最晚入库时间">
-          <el-date-picker v-model="editRow.partsTime" placeholder="选择日期时间" value-format="yyyy-MM-dd "></el-date-picker>
+          <el-date-picker v-model="editRow.partsDate" placeholder="选择日期时间" value-format="yyyy-MM-dd "></el-date-picker>
         </el-form-item>
         <el-form-item label="半成品最晚入库">
-          <el-date-picker v-model="editRow.halfTime"
+          <el-date-picker v-model="editRow.halfDate"
 
                           placeholder="选择日期时间"
                           value-format="yyyy-MM-dd">
@@ -87,8 +87,7 @@
         </el-form-item>
         <el-form-item label="截止日期">
           <el-date-picker v-model="editRow.planDate"
-
-                          placeholder="选择日期时间"
+                          placeholder="选择日期"
                           value-format="yyyy-MM-dd">
 
           </el-date-picker>

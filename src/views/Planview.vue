@@ -47,7 +47,11 @@
         </el-form-item>
         <el-form-item label="截止日期">
           <!-- Use el-date-picker for selecting a date -->
-          <el-date-picker v-model="addRow.planDate" placeholder="选择日期" value-format="yyyy-MM-dd"></el-date-picker>
+          <el-date-picker v-model="addRow.planDate"
+                          placeholder="选择日期"
+                          value-format="yyyy-MM-dd">
+
+          </el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer">
