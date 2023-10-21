@@ -33,7 +33,7 @@
           <span style="color: #ff0000;">{{ scope.row.purchaseQuantity }}</span>
         </template>
         </el-table-column>
-        <el-table-column prop="partsTime" label="最晚入库时间">
+        <el-table-column prop="partsDate" label="最晚入库时间">
           <template slot-scope="scope">
             <span v-if="scope.row.halfDate">{{ scope.row.halfDate }}</span>
             <span v-else>{{ scope.row.partsDate }}</span>
@@ -160,7 +160,9 @@ export default {
   },
   methods:{
     load(){
-      const group = localStorage.getItem("group")
+      const user = localStorage.getItem("user");
+      const group =JSON.parse(user).group;
+      console.log(group)
       let url = null
       if (group === "零件仓库") {
         url = "/parts/getParts"

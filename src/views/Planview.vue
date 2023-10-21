@@ -30,7 +30,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="车间最迟完工">
-          <el-date-picker v-model="addRow.producerTime"
+          <el-date-picker v-model="addRow.producerDate"
 
                           placeholder="选择日期时间"
                           value-format="yyyy-MM-dd">
@@ -38,7 +38,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="最迟发货">
-          <el-date-picker v-model="addRow.exportTime"
+          <el-date-picker v-model="addRow.exportDate"
 
                           placeholder="选择日期时间"
                           value-format="yyyy-MM-dd">
@@ -218,14 +218,19 @@ export default {
     },
     // 保存新增
     saveAdd() {
-      const partsTimeTimestamp = new Date(this.editRow.partsTime).getTime();
-      const halfTimeTimestamp = new Date(this.editRow.halfTime).getTime();
-      const exportTimeTimestamp = new Date(this.editRow.exportTime).getTime();
+      const partsTimeTimestamp = new Date(this.editRow.partsDate).getTime();
+      const halfTimeTimestamp = new Date(this.editRow.halfDate).getTime();
+      const exportTimeTimestamp = new Date(this.editRow.exportDate).getTime();
       const planDateTimestamp = new Date(this.editRow.planDate).getTime();
+      const producerTimestamp = new Date(this.editRow.producerDate).getTime();
+      if (partsTimeTimestamp > producerTimestamp || halfTimeTimestamp > producerTimestamp) {
+        this.$message.error("零件最晚入库时间和半成品最晚入库时间不能晚于最晚完工时间");
+        return;
+      }
 
-      // 检查零件最晚入库时间和半成品最晚入库时间是否晚于最迟发货时间
-      if (partsTimeTimestamp > exportTimeTimestamp || halfTimeTimestamp > exportTimeTimestamp) {
-        this.$message.error("零件最晚入库时间和半成品最晚入库时间不能晚于最迟发货时间");
+      // 检查最晚完工时间是否晚于最迟发货时间
+      if (producerTimestamp > exportTimeTimestamp) {
+        this.$message.error("最晚完工时间不能晚于最迟发货时间");
         return;
       }
 
@@ -234,10 +239,13 @@ export default {
         this.$message.error("最迟发货时间不能晚于截止日期");
         return;
       }
+
+      // 检查数量和截止日期是否为空
       if (!this.addRow.planNum || !this.addRow.planDate) {
         this.$message.error("数量和截止日期不能为空");
         return;
       }
+
       request.post("plan/editPlan", this.addRow
 
       ).then((res) => {
