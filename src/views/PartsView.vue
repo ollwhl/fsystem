@@ -242,6 +242,7 @@ export default {
       this.stockOrderVisible = true;
     },
     downloadStockOrderExcel() {
+      console.log('Download button clicked');
       // 调用导出 Excel 的方法并传递备货单数据
       this.exportToExcel(this.stockOrderList);
     },
