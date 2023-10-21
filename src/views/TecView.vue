@@ -2,7 +2,7 @@
 
   <div>
     <el-input
-        v-model="params.productName"
+        v-model="params.keyword"
         placeholder="输入产品名进行搜索合成表"
         :style="{ width: '25%' }"
         style="margin-bottom: 10px"

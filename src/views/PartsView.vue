@@ -21,6 +21,7 @@
           border
           style="width: 100%"
       >
+
         <!-- 在这里添加显示备货单的表格列 -->
         <el-table-column prop="name" label="零件名"></el-table-column>
         <el-table-column prop="id" label="编码"></el-table-column>
@@ -122,6 +123,7 @@
 <script>
 import request from "@/utils/request";
 import XLSX from 'xlsx';
+
 export default {
   name:"PartsView",
   data(){
@@ -154,6 +156,7 @@ export default {
   },
   created() {//页面创建时调用的方法
     this.load()
+
   },
   methods:{
     load(){
@@ -253,7 +256,8 @@ export default {
       XLSX.utils.book_append_sheet(workbook, worksheet, '备货单');
 
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openmosix-officiated.spreadsheet.sheet' });
+
       const url = window.URL.createObjectURL(blob);
 
       // 创建一个下载链接并模拟点击
