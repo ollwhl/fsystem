@@ -122,7 +122,7 @@
 
 <script>
 import request from "@/utils/request";
-import XLSX from 'xlsx';
+import * as XLSX from 'xlsx';
 
 export default {
   name:"PartsView",
