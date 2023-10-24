@@ -49,6 +49,7 @@
               <el-option label="计划部" value="计划部"></el-option>
               <el-option label="科技部" value="科技部"></el-option>
               <el-option label="生产部" value="生产部"></el-option>
+              <el-option label="离职" value="离职"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="密码" :label-width="formLabelWidth">
