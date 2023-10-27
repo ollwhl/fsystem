@@ -1,3 +1,3 @@
 # fsystem
 
-仓库零件管理系统
+Factory Production Management System front end
